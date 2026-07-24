@@ -24,7 +24,7 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
-        <!-- Buscador y Filtro por País/Mercado -->
+        <!-- Buscador y Filtro por Mercado -->
         <div class="flex flex-col sm:flex-row gap-4 mb-6">
             <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Buscar por Ticker, Empresa o Emisor..." class="bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2.5 w-full sm:w-80 focus:outline-none focus:border-emerald-500">
             <select id="marketFilter" onchange="filterData()" class="bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2.5">
@@ -48,6 +48,7 @@
                             <th class="p-4">Mercado</th>
                             <th class="p-4">Ticker / Empresa</th>
                             <th class="p-4">Sector</th>
+                            <th class="p-4 text-right">Precio</th>
                             <th class="p-4 text-center">Índice Local</th>
                             <th class="p-4 text-center">S&P Yearbook</th>
                             <th class="p-4 text-center">Categoría S&P</th>
@@ -85,29 +86,30 @@
 
     <script>
         // ENLACES GOOGLE SHEETS (CSV PUBLICADO)
-        const URL_CSV_RENTA_VARIABLE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRniAeWLI97k7vcn5TzlBg0n89Ird3Rb-619RqXvHTEJ-aIniWGzsCIKrYWt0fX_Q/pub?gid=373182793&single=true&output=csv";
-        const URL_CSV_RENTA_FIJA = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRniAeWLI97k7vcn5TzlBg0n89Ird3Rb-619RqXvHTEJ-aIniWGzsCIKrYWt0fX_Q/pub?gid=2120126879&single=true&output=csv";
+        const URL_CSV_RENTA_VARIABLE = "";
+        const URL_CSV_RENTA_FIJA = "";
 
-        // Base de Datos Demo completa para los 7 países
+        // Base de Datos Demo con la nueva columna de Precio
         const demoRV = [
-            ["BYMA", "YPFD", "YPF S.A.", "Energía", "Sí", "Sí", "Industry Mover", "https://www.ypf.com/sustentabilidad"],
-            ["BYMA", "GGAL", "Grupo Financiero Galicia", "Financiero", "Sí", "No", "N/A", "https://www.galicia.ar/sustentabilidad"],
-            ["B3", "B3SA3", "B3 S.A. - Brasil", "Financiero", "Sí", "Sí", "Top 5%", "https://ri.b3.com.br/sostenibilidad"],
-            ["B3", "ITUB4", "Itaú Unibanco", "Financiero", "Sí", "Sí", "Top 10%", "https://www.itau.com.br/sustentabilidade"],
-            ["B3", "SUZB3", "Suzano S.A.", "Materiales", "Sí", "Sí", "Top 5%", "https://www.suzano.com.br/sustentabilidade"],
-            ["Santiago", "CMPC", "Empresas CMPC", "Materiales", "Sí", "Sí", "Top 1%", "https://www.cmpc.com/sostenibilidad"],
-            ["Santiago", "BSANTANDER", "Banco Santander Chile", "Financiero", "Sí", "Sí", "Top 10%", "https://www.santander.cl/sostenibilidad"],
-            ["bvc", "BCOLOMBIA", "Bancolombia", "Financiero", "Sí", "Sí", "Top 1%", "https://www.bancolombia.com/sostenibilidad"],
-            ["bvc", "ISA", "Interconexión Eléctrica ISA", "Servicios Públicos", "Sí", "Sí", "Top 5%", "https://www.isa.co/sostenibilidad"],
-            ["BMV", "GFNORTE", "Grupo Financiero Banorte", "Financiero", "Sí", "Sí", "Top 5%", "https://investors.banorte.com/sostenibilidad"],
-            ["BMV", "CEMEX", "Cemex", "Materiales", "Sí", "Sí", "Top 10%", "https://www.cemex.com/sostenibilidad"],
-            ["BVL", "BAP", "Credicorp / BCP", "Financiero", "Sí", "Sí", "Member", "https://www.credicorp.com/sostenibilidad"],
-            ["BVL", "CPACASC1", "Cementos Pacasmayo", "Materiales", "Sí", "Sí", "Industry Mover", "https://www.cementospacasmayo.com.pe"],
-            ["JSE", "NCBFG", "NCB Financial Group", "Financiero", "Sí", "No", "N/A", "https://www.myncb.com/sustainability"]
+            ["BYMA", "YPFD", "YPF S.A.", "Energía", "ARS 32.450", "Sí", "Sí", "Industry Mover", "https://www.ypf.com/sustentabilidad"],
+            ["BYMA", "GGAL", "Grupo Financiero Galicia", "Financiero", "ARS 5.120", "Sí", "No", "N/A", "https://www.galicia.ar/sustentabilidad"],
+            ["B3", "B3SA3", "B3 S.A. - Brasil", "Financiero", "BRL 12.40", "Sí", "Sí", "Top 5%", "https://ri.b3.com.br/sostenibilidad"],
+            ["B3", "ITUB4", "Itaú Unibanco", "Financiero", "BRL 34.15", "Sí", "Sí", "Top 10%", "https://www.itau.com.br/sustentabilidade"],
+            ["B3", "SUZB3", "Suzano S.A.", "Materiales", "BRL 58.90", "Sí", "Sí", "Top 5%", "https://www.suzano.com.br/sustentabilidade"],
+            ["Santiago", "CMPC", "Empresas CMPC", "Materiales", "CLP 1.820", "Sí", "Sí", "Top 1%", "https://www.cmpc.com/sostenibilidad"],
+            ["Santiago", "BSANTANDER", "Banco Santander Chile", "Financiero", "CLP 46.80", "Sí", "Sí", "Top 10%", "https://www.santander.cl/sostenibilidad"],
+            ["bvc", "BCOLOMBIA", "Bancolombia", "Financiero", "COP 33.500", "Sí", "Sí", "Top 1%", "https://www.bancolombia.com/sostenibilidad"],
+            ["bvc", "ISA", "Interconexión Eléctrica ISA", "Servicios Públicos", "COP 18.200", "Sí", "Sí", "Top 5%", "https://www.isa.co/sostenibilidad"],
+            ["BMV", "GFNORTE", "Grupo Financiero Banorte", "Financiero", "MXN 168.50", "Sí", "Sí", "Top 5%", "https://investors.banorte.com/sostenibilidad"],
+            ["BMV", "CEMEX", "Cemex", "Materiales", "MXN 13.90", "Sí", "Sí", "Top 10%", "https://www.cemex.com/sostenibilidad"],
+            ["BVL", "BAP", "Credicorp / BCP", "Financiero", "USD 174.20", "Sí", "Sí", "Member", "https://www.credicorp.com/sostenibilidad"],
+            ["BVL", "CPACASC1", "Cementos Pacasmayo", "Materiales", "PEN 4.15", "Sí", "Sí", "Industry Mover", "https://www.cementospacasmayo.com.pe"],
+            ["JSE", "NCBFG", "NCB Financial Group", "Financiero", "JMD 65.00", "Sí", "No", "N/A", "https://www.myncb.com/sustainability"]
         ];
 
         const demoRF = [
             ["BYMA", "Plaza Logística", "BPO2O", "Verde", "🟢 Normal", "AA+(arg)", "Cumplimiento normal de repagos", "Emisión neta neutral en parques"],
+            ["BYMA", "Telecom Argentina", "TLC1O", "SLB", "🟢 Normal", "AA+(arg)", "Cumplimiento de metas de renovables", "Incrementar uso de energía renovable al 50%"],
             ["B3", "Suzano S.A.", "US86964W", "SLB", "🟢 Normal", "BBB-", "Monitoreo regular de metas", "Reducción intensidad agua industrial 15%"],
             ["B3", "Light S.A.", "US532241", "Verde", "🔴 Alerta Default", "D", "En proceso de Recuperación Judicial", "Pérdidas no técnicas y proyectos eficiencia"],
             ["Santiago", "Codelco", "US219876", "Sostenible", "🟡 Observación", "BBB+", "Ajuste en proyectos hídricos", "Reducción 60% uso agua fresca 2030"],
@@ -170,8 +172,8 @@
 
         function usarFallbackRV() {
             datosRV = demoRV.map(row => ({
-                mercado: row[0], ticker: row[1], empresa: row[2], sector: row[3],
-                indiceLocal: row[4], spYearbook: row[5], categoriaSP: row[6], reporte: row[7]
+                mercado: row[0], ticker: row[1], empresa: row[2], sector: row[3], precio: row[4],
+                indiceLocal: row[5], spYearbook: row[6], categoriaSP: row[7], reporte: row[8]
             }));
             renderizarTablaRV(datosRV);
         }
@@ -192,14 +194,14 @@
                 const m = (r[0] || '').trim();
                 if (mercadosValidos.includes(m)) {
                     list.push({
-                        mercado: m, ticker: r[1] || '', empresa: r[2] || '', sector: r[3] || '',
-                        indiceLocal: r[4] || '', spYearbook: r[5] || '', categoriaSP: r[6] || '', reporte: r[7] || ''
+                        mercado: m, ticker: r[1] || '', empresa: r[2] || '', sector: r[3] || '', precio: r[4] || '-',
+                        indiceLocal: r[5] || '', spYearbook: r[6] || '', categoriaSP: r[7] || '', reporte: r[8] || ''
                     });
                 }
             });
             return list.length > 0 ? list : demoRV.map(row => ({
-                mercado: row[0], ticker: row[1], empresa: row[2], sector: row[3],
-                indiceLocal: row[4], spYearbook: row[5], categoriaSP: row[6], reporte: row[7]
+                mercado: row[0], ticker: row[1], empresa: row[2], sector: row[3], precio: row[4],
+                indiceLocal: row[5], spYearbook: row[6], categoriaSP: row[7], reporte: row[8]
             }));
         }
 
@@ -237,6 +239,7 @@
                     <td class="p-4"><span class="px-2 py-1 bg-slate-800 rounded-md text-xs font-medium">${item.mercado}</span></td>
                     <td class="p-4"><div class="font-bold text-white">${item.ticker}</div><div class="text-xs text-slate-400">${item.empresa}</div></td>
                     <td class="p-4 text-slate-300">${item.sector}</td>
+                    <td class="p-4 text-right font-mono text-emerald-400 font-medium">${item.precio}</td>
                     <td class="p-4 text-center">${item.indiceLocal === 'Sí' ? '<span class="text-emerald-400 font-bold">✓</span>' : '-'}</td>
                     <td class="p-4 text-center">${spBadge}</td>
                     <td class="p-4 text-center text-slate-300 text-xs">${item.categoriaSP}</td>
