@@ -1,298 +1,337 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barómetro ASG Latam — Hub de Inteligencia Bursátil & Riesgo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barómetro ASG Latam — CapacitaRSE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+<style>
+  :root{
+    --cap-teal:#60afc1; --cap-teal-10:rgba(96,175,193,0.10); --cap-teal-20:rgba(96,175,193,0.20);
+    --cap-teal-35:rgba(96,175,193,0.35); --cap-teal-60:rgba(96,175,193,0.60);
+    --cap-violet:#696484; --cap-violet-10:rgba(105,100,132,0.10); --cap-violet-20:rgba(105,100,132,0.20);
+    --cap-gold:#f5b800; --cap-gold-10:rgba(245,184,0,0.10); --cap-gold-20:rgba(245,184,0,0.20);
+    --cap-gray:#9ba1a5; --cap-gray-10:rgba(155,161,165,0.10);
+    --cap-coral:#e76f51; --cap-coral-10:rgba(231,111,81,0.10);
+    --cap-navy:#09193a; --cap-white:#ffffff;
+  }
+  body{ font-family:'Inter', system-ui, sans-serif; }
+  ::-webkit-scrollbar{ height:8px; width:8px; }
+  ::-webkit-scrollbar-thumb{ background:var(--cap-gray); border-radius:4px; }
+  .tab-active{ background:var(--cap-teal); color:#fff; }
+  .tab-inactive{ background:transparent; color:var(--cap-navy); }
+  table thead th{ background:var(--cap-navy); color:#fff; }
+  tbody tr:nth-child(even){ background:var(--cap-teal-10); }
+  tbody tr:hover{ background:var(--cap-teal-20); }
+</style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans min-h-screen pb-12">
+<body class="bg-[#f8f9fa] text-[#09193a] min-h-screen pb-16">
 
-    <!-- Header -->
-    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-3 h-8 bg-emerald-500 rounded-full"></div>
-                <h1 class="text-2xl font-bold tracking-tight text-white">Barómetro <span class="text-emerald-400">ASG Latam</span></h1>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="switchTab('rv')" id="btn-rv" class="px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-lg">Renta Variable (Acciones)</button>
-                <button onclick="switchTab('rf')" id="btn-rf" class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-300 hover:bg-slate-700">Renta Fija (Bonos ASG)</button>
-            </div>
-        </div>
-    </header>
+<header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+  <div class="h-[5px] bg-[#60afc1]"></div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+    <div class="flex items-center gap-4">
+      <div class="w-14 h-14 rounded-lg border-2 border-dashed border-[#60afc1] flex items-center justify-center text-[9px] leading-tight text-center text-[#60afc1] shrink-0" title="Colocar aquí logo_CapacitaRSE.png">LOGO<br>CapacitaRSE</div>
+      <div>
+        <h1 class="text-2xl sm:text-[28px] font-bold tracking-tight text-[#09193a]">Barómetro <span class="text-[#60afc1]">ASG Latam</span></h1>
+        <p class="text-sm text-[#696484] mt-0.5">Renta variable y renta fija ASG en 7 mercados de la región · <a href="https://cursosderse.com" class="underline hover:text-[#60afc1]">CapacitaRSE</a></p>
+      </div>
+    </div>
+    <nav class="flex gap-1 bg-[#60afc1]/10 p-1 rounded-lg w-full lg:w-auto">
+      <button onclick="switchTab('rv')" id="btn-rv" class="tab-active flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors">Renta Variable</button>
+      <button onclick="switchTab('rf')" id="btn-rf" class="tab-inactive flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors hover:bg-white">Renta Fija</button>
+    </nav>
+  </div>
+</header>
 
-    <main class="max-w-7xl mx-auto px-4 py-8">
-        <!-- Buscador y Filtro por Mercado -->
-        <div class="flex flex-col sm:flex-row gap-4 mb-6">
-            <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Buscar por Ticker, Empresa o Emisor..." class="bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2.5 w-full sm:w-80 focus:outline-none focus:border-emerald-500">
-            <select id="marketFilter" onchange="filterData()" class="bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2.5">
-                <option value="ALL">Todos los Mercados (Latam & Caribe)</option>
-                <option value="BYMA">BYMA (Argentina)</option>
-                <option value="B3">B3 (Brasil)</option>
-                <option value="Santiago">Bolsa de Santiago (Chile)</option>
-                <option value="bvc">bvc (Colombia)</option>
-                <option value="BMV">BMV (México)</option>
-                <option value="BVL">BVL (Perú)</option>
-                <option value="JSE">JSE (Jamaica)</option>
-            </select>
-        </div>
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
-        <!-- Vista Renta Variable -->
-        <div id="tab-rv" class="block">
-            <div class="overflow-x-auto bg-slate-950 border border-slate-800 rounded-xl shadow-xl">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-800/80 text-xs text-slate-400 uppercase">
-                        <tr>
-                            <th class="p-4">Mercado</th>
-                            <th class="p-4">Ticker / Empresa</th>
-                            <th class="p-4">Sector</th>
-                            <th class="p-4 text-right">Precio</th>
-                            <th class="p-4 text-center">Índice Local</th>
-                            <th class="p-4 text-center">S&P Yearbook</th>
-                            <th class="p-4 text-center">Categoría S&P</th>
-                            <th class="p-4 text-center">Reporte ASG</th>
-                        </tr>
-                    </thead>
-                    <tbody id="rv-table-body" class="divide-y divide-slate-800 text-sm">
-                        <!-- Carga dinámica -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+  <!-- KPIs -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-lg border-l-[3px] border-[#60afc1] shadow-sm p-4">
+      <div class="text-xs uppercase tracking-wide text-[#9ba1a5] font-medium">Acciones monitoreadas</div>
+      <div id="kpi-acciones" class="text-3xl font-bold text-[#09193a] mt-1">—</div>
+    </div>
+    <div class="bg-white rounded-lg border-l-[3px] border-[#696484] shadow-sm p-4">
+      <div class="text-xs uppercase tracking-wide text-[#9ba1a5] font-medium">En S&amp;P Sustainability Yearbook</div>
+      <div id="kpi-spyearbook" class="text-3xl font-bold text-[#09193a] mt-1">—</div>
+    </div>
+    <div class="bg-white rounded-lg border-l-[3px] border-[#f5b800] shadow-sm p-4">
+      <div class="text-xs uppercase tracking-wide text-[#9ba1a5] font-medium">Bonos ASG monitoreados</div>
+      <div id="kpi-bonos" class="text-3xl font-bold text-[#09193a] mt-1">—</div>
+    </div>
+    <div class="bg-white rounded-lg border-l-[3px] border-[#e76f51] shadow-sm p-4">
+      <div class="text-xs uppercase tracking-wide text-[#9ba1a5] font-medium">Bonos en alerta / default</div>
+      <div id="kpi-alerta" class="text-3xl font-bold text-[#e76f51] mt-1">—</div>
+    </div>
+  </div>
 
-        <!-- Vista Renta Fija -->
-        <div id="tab-rf" class="hidden">
-            <div class="overflow-x-auto bg-slate-950 border border-slate-800 rounded-xl shadow-xl">
-                <table class="w-full text-left border-collapse">
-                    <thead class="bg-slate-800/80 text-xs text-slate-400 uppercase">
-                        <tr>
-                            <th class="p-4">Mercado</th>
-                            <th class="p-4">Emisor / Bono</th>
-                            <th class="p-4">Tipo</th>
-                            <th class="p-4 text-center">Estado Riesgo</th>
-                            <th class="p-4">Alerta / Indicador</th>
-                            <th class="p-4">KPI Sostenibilidad</th>
-                        </tr>
-                    </thead>
-                    <tbody id="rf-table-body" class="divide-y divide-slate-800 text-sm">
-                        <!-- Carga dinámica -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
+  <!-- Filtros -->
+  <div class="flex flex-col sm:flex-row flex-wrap gap-3 mb-5">
+    <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Buscar por ticker, empresa, emisor o bono..."
+      class="bg-white border border-slate-300 text-[#09193a] rounded-lg px-4 py-2.5 w-full sm:w-72 text-sm focus:outline-none focus:border-[#60afc1] focus:ring-1 focus:ring-[#60afc1]">
+    <select id="marketFilter" onchange="filterData()" class="bg-white border border-slate-300 text-[#09193a] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#60afc1]">
+      <option value="ALL">Todos los mercados</option>
+      <option value="BYMA">BYMA (Argentina)</option>
+      <option value="B3">B3 (Brasil)</option>
+      <option value="Santiago">Bolsa de Santiago (Chile)</option>
+      <option value="bvc">bvc (Colombia)</option>
+      <option value="BMV">BMV (México)</option>
+      <option value="BVL">BVL (Perú)</option>
+      <option value="JSE">JSE (Jamaica)</option>
+    </select>
+    <select id="sectorFilter" onchange="filterData()" class="bg-white border border-slate-300 text-[#09193a] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#60afc1]">
+      <option value="ALL">Todos los sectores</option>
+    </select>
+    <select id="tipoBonoFilter" onchange="filterData()" class="hidden bg-white border border-slate-300 text-[#09193a] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#60afc1]">
+      <option value="ALL">Todos los tipos de bono</option>
+    </select>
+    <select id="estadoRiesgoFilter" onchange="filterData()" class="hidden bg-white border border-slate-300 text-[#09193a] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#60afc1]">
+      <option value="ALL">Todos los estados de riesgo</option>
+      <option value="Normal">🟢 Normal</option>
+      <option value="Observación">🟡 Observación</option>
+      <option value="Alerta">🔴 Alerta Default</option>
+    </select>
+  </div>
 
-    <script>
-        // ENLACES GOOGLE SHEETS (CSV PUBLICADO)
-        const URL_CSV_RENTA_VARIABLE = "";
-        const URL_CSV_RENTA_FIJA = "";
+  <!-- Vista Renta Variable -->
+  <div id="tab-rv" class="block">
+    <div class="overflow-x-auto bg-white border border-slate-200 rounded-xl shadow-sm">
+      <table class="w-full text-left border-collapse">
+        <thead class="text-xs uppercase tracking-wide">
+          <tr>
+            <th class="p-3.5">Mercado</th>
+            <th class="p-3.5">Ticker / Empresa</th>
+            <th class="p-3.5">Sector GICS</th>
+            <th class="p-3.5 text-right">Precio</th>
+            <th class="p-3.5 text-center">Índice Local ASG</th>
+            <th class="p-3.5 text-center">S&amp;P Yearbook</th>
+            <th class="p-3.5 text-center">Categoría S&amp;P</th>
+            <th class="p-3.5">Reporte ASG</th>
+          </tr>
+        </thead>
+        <tbody id="rv-table-body" class="divide-y divide-slate-100 text-sm"></tbody>
+      </table>
+    </div>
+    <p id="rv-count" class="text-xs text-[#9ba1a5] mt-3"></p>
+  </div>
 
-        // Base de Datos Demo con la nueva columna de Precio
-        const demoRV = [
-            ["BYMA", "YPFD", "YPF S.A.", "Energía", "ARS 32.450", "Sí", "Sí", "Industry Mover", "https://www.ypf.com/sustentabilidad"],
-            ["BYMA", "GGAL", "Grupo Financiero Galicia", "Financiero", "ARS 5.120", "Sí", "No", "N/A", "https://www.galicia.ar/sustentabilidad"],
-            ["B3", "B3SA3", "B3 S.A. - Brasil", "Financiero", "BRL 12.40", "Sí", "Sí", "Top 5%", "https://ri.b3.com.br/sostenibilidad"],
-            ["B3", "ITUB4", "Itaú Unibanco", "Financiero", "BRL 34.15", "Sí", "Sí", "Top 10%", "https://www.itau.com.br/sustentabilidade"],
-            ["B3", "SUZB3", "Suzano S.A.", "Materiales", "BRL 58.90", "Sí", "Sí", "Top 5%", "https://www.suzano.com.br/sustentabilidade"],
-            ["Santiago", "CMPC", "Empresas CMPC", "Materiales", "CLP 1.820", "Sí", "Sí", "Top 1%", "https://www.cmpc.com/sostenibilidad"],
-            ["Santiago", "BSANTANDER", "Banco Santander Chile", "Financiero", "CLP 46.80", "Sí", "Sí", "Top 10%", "https://www.santander.cl/sostenibilidad"],
-            ["bvc", "BCOLOMBIA", "Bancolombia", "Financiero", "COP 33.500", "Sí", "Sí", "Top 1%", "https://www.bancolombia.com/sostenibilidad"],
-            ["bvc", "ISA", "Interconexión Eléctrica ISA", "Servicios Públicos", "COP 18.200", "Sí", "Sí", "Top 5%", "https://www.isa.co/sostenibilidad"],
-            ["BMV", "GFNORTE", "Grupo Financiero Banorte", "Financiero", "MXN 168.50", "Sí", "Sí", "Top 5%", "https://investors.banorte.com/sostenibilidad"],
-            ["BMV", "CEMEX", "Cemex", "Materiales", "MXN 13.90", "Sí", "Sí", "Top 10%", "https://www.cemex.com/sostenibilidad"],
-            ["BVL", "BAP", "Credicorp / BCP", "Financiero", "USD 174.20", "Sí", "Sí", "Member", "https://www.credicorp.com/sostenibilidad"],
-            ["BVL", "CPACASC1", "Cementos Pacasmayo", "Materiales", "PEN 4.15", "Sí", "Sí", "Industry Mover", "https://www.cementospacasmayo.com.pe"],
-            ["JSE", "NCBFG", "NCB Financial Group", "Financiero", "JMD 65.00", "Sí", "No", "N/A", "https://www.myncb.com/sustainability"]
-        ];
+  <!-- Vista Renta Fija -->
+  <div id="tab-rf" class="hidden">
+    <div class="overflow-x-auto bg-white border border-slate-200 rounded-xl shadow-sm">
+      <table class="w-full text-left border-collapse">
+        <thead class="text-xs uppercase tracking-wide">
+          <tr>
+            <th class="p-3.5">Mercado</th>
+            <th class="p-3.5">Emisor / Bono</th>
+            <th class="p-3.5">Tipo</th>
+            <th class="p-3.5 text-center">Estado de Riesgo</th>
+            <th class="p-3.5 text-center">Rating</th>
+            <th class="p-3.5">Alerta / Indicador de Mercado</th>
+            <th class="p-3.5">KPI Sostenibilidad / Covenant</th>
+            <th class="p-3.5">Documentación</th>
+          </tr>
+        </thead>
+        <tbody id="rf-table-body" class="divide-y divide-slate-100 text-sm"></tbody>
+      </table>
+    </div>
+    <p id="rf-count" class="text-xs text-[#9ba1a5] mt-3"></p>
+  </div>
 
-        const demoRF = [
-            ["BYMA", "Plaza Logística", "BPO2O", "Verde", "🟢 Normal", "AA+(arg)", "Cumplimiento normal de repagos", "Emisión neta neutral en parques"],
-            ["BYMA", "Telecom Argentina", "TLC1O", "SLB", "🟢 Normal", "AA+(arg)", "Cumplimiento de metas de renovables", "Incrementar uso de energía renovable al 50%"],
-            ["B3", "Suzano S.A.", "US86964W", "SLB", "🟢 Normal", "BBB-", "Monitoreo regular de metas", "Reducción intensidad agua industrial 15%"],
-            ["B3", "Light S.A.", "US532241", "Verde", "🔴 Alerta Default", "D", "En proceso de Recuperación Judicial", "Pérdidas no técnicas y proyectos eficiencia"],
-            ["Santiago", "Codelco", "US219876", "Sostenible", "🟡 Observación", "BBB+", "Ajuste en proyectos hídricos", "Reducción 60% uso agua fresca 2030"],
-            ["Santiago", "VTR Finance", "US918321", "SLB", "🔴 Alerta Default", "CC", "Riesgo reestructuración / periodo gracia", "Fibra óptica rural y eficiencia energética"],
-            ["bvc", "Bancolombia", "US05968L", "Sostenible", "🟢 Normal", "BB+", "Emisión sostenible destacada", "Proyectos de energía solar y vivienda social"],
-            ["bvc", "Ecopetrol", "US279158", "Sostenible", "🟡 Observación", "BB+", "Seguimiento descarbonización", "Reducción emisiones Alcance 1 y 2 al 25%"],
-            ["BMV", "Cemex", "US151290", "SLB", "🟢 Normal", "BBB-", "Meta CO2 cumplida por tonelada", "Cemento bajo carbono Vertua"],
-            ["BMV", "TV Azteca", "US88034P", "Sostenible", "🔴 Alerta Default", "D", "Conflicto legal / Incumplimiento de cupones", "Inclusión digital comunidades alejadas"],
-            ["BVL", "COFIDE", "US197022", "Sostenible", "🟢 Normal", "BBB-", "Fondo desarrollo operando normal", "Financiamiento pymes lideradas por mujeres"],
-            ["JSE", "TransJam Infra", "JM000100", "Verde", "🟢 Normal", "A+(jm)", "Pagos peaje verde regulares", "Reforestación y alumbrado solar en autopistas"]
-        ];
+  <footer class="mt-10 pt-6 border-t border-slate-200 text-xs text-[#9ba1a5] leading-relaxed">
+    <p>Barómetro ASG Latam · CapacitaRSE — <a href="https://cursosderse.com" class="underline hover:text-[#60afc1]">cursosderse.com</a></p>
+    <p class="mt-1">Información de referencia con fines educativos y de monitoreo. No constituye recomendación de inversión ni asesoramiento financiero. Los precios de mercado son referenciales y pueden no reflejar cotizaciones en tiempo real; verificar siempre en la fuente oficial de cada bolsa.</p>
+  </footer>
 
-        let datosRV = [];
-        let datosRF = [];
+</main>
 
-        function switchTab(tab) {
-            document.getElementById('tab-rv').classList.toggle('hidden', tab !== 'rv');
-            document.getElementById('tab-rf').classList.toggle('hidden', tab !== 'rf');
-            
-            document.getElementById('btn-rv').className = tab === 'rv' 
-                ? 'px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-lg' 
-                : 'px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-300 hover:bg-slate-700';
-            
-            document.getElementById('btn-rf').className = tab === 'rf' 
-                ? 'px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-lg' 
-                : 'px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-300 hover:bg-slate-700';
-        }
+<script>
+  // ENLACES A CSV PUBLICADO (Google Sheets > Archivo > Compartir > Publicar en la web > CSV)
+  // Si se completan estas URLs, el sitio pasa a leer datos en vivo desde la planilla en lugar de la base embebida.
+  const URL_CSV_RENTA_VARIABLE = "";
+  const URL_CSV_RENTA_FIJA = "";
 
-        function cargarDatos() {
-            if (URL_CSV_RENTA_VARIABLE && URL_CSV_RENTA_VARIABLE.length > 10) {
-                Papa.parse(URL_CSV_RENTA_VARIABLE, {
-                    download: true,
-                    header: false,
-                    skipEmptyLines: true,
-                    complete: function(results) {
-                        datosRV = procesarFilasRV(results.data);
-                        renderizarTablaRV(datosRV);
-                    },
-                    error: function() { usarFallbackRV(); }
-                });
-            } else {
-                usarFallbackRV();
-            }
+  // Base de datos embebida — sincronizada desde Base_Barometro_ASG-3.xlsx (42 acciones / 22 bonos)
+  const baseRV = [["BYMA", "YPFD", "YPF S.A.", "Energía", "81575", "Sí", "Sí", "Industry Mover", "https://www.ypf.com/sustentabilidad", "Publicado", "2026-03"], ["BYMA", "ALUA", "Aluar Arg. de Aluminio", "Materiales", "975.5", "Sí", "No", "N/A", "https://www.aluar.com.ar/sustentabilidad", "Publicado", "2025-11"], ["BYMA", "GGAL", "Grupo Financiero Galicia", "Financiero", "7930", "Sí", "No", "N/A", "https://www.galicia.ar/sustentabilidad", "Publicado", "2026-01"], ["BYMA", "BMA", "Banco Macro", "Financiero", "14560", "Sí", "No", "N/A", "https://www.macro.com.ar/sustentabilidad", "Publicado", "2025-10"], ["BYMA", "PAMP", "Pampa Energía", "Servicios Públicos", "5510", "Sí", "No", "N/A", "https://www.pampaenergia.com/sustentabilidad", "Publicado", "2026-01"], ["B3", "B3SA3", "B3 S.A. - Brasil, Bolsa, Balcão", "Financiero", "15.55", "Sí", "Sí", "Top 5%", "https://ri.b3.com.br/sostenibilidad", "Publicado", "2026-02"], ["B3", "ITUB4", "Itaú Unibanco Holding", "Financiero", "42.11", "Sí", "Sí", "Top 10%", "https://www.itau.com.br/sustentabilidade", "Publicado", "2026-02"], ["B3", "BBDC4", "Banco Bradesco", "Financiero", "18.52", "Sí", "Sí", "Top 5%", "https://www.bradescosustentabilidade.com.br", "Publicado", "2026-02"], ["B3", "SUZB3", "Suzano S.A.", "Materiales", "41.79", "Sí", "Sí", "Top 5%", "https://www.suzano.com.br/sustentabilidade", "Publicado", "2026-02"], ["B3", "VALE3", "Vale S.A.", "Materiales", "75.25", "Sí", "Sí", "Member", "https://www.vale.com/es/esg", "Publicado", "2026-01"], ["B3", "WEGE3", "WEG S.A.", "Bienes de Capital", "45.55", "Sí", "Sí", "Member", "https://www.weg.net/sostenibilidad", "Publicado", "2026-02"], ["B3", "CPFE3", "CPFL Energia", "Servicios Públicos", "45.44", "Sí", "Sí", "Top 1%", "https://www.cpfl.com.br/sustentabilidade", "Publicado", "2026-02"], ["B3", "PETR4", "Petrobras", "Energía", "42.34", "Sí", "No", "N/A", "https://sustentabilidade.petrobras.com.br", "Publicado", "2026-01"], ["Santiago", "CMPC", "Empresas CMPC", "Materiales", "#N/A", "Sí", "Sí", "Top 1%", "https://www.cmpc.com/sostenibilidad", "Publicado", "2026-02"], ["Santiago", "AGUAS-A", "Aguas Andinas", "Servicios Públicos", "#N/A", "Sí", "Sí", "Top 5%", "https://www.aguasandinas.cl/sostenibilidad", "Publicado", "2026-02"], ["Santiago", "CAP", "CAP S.A.", "Materiales", "#N/A", "Sí", "Sí", "Top 10%", "https://www.cap.cl/sostenibilidad", "Publicado", "2026-02"], ["Santiago", "BSANTANDER", "Banco Santander Chile", "Financiero", "#N/A", "Sí", "Sí", "Top 10%", "https://www.santander.cl/sostenibilidad", "Publicado", "2026-02"], ["Santiago", "ENELCHILE", "Enel Chile", "Servicios Públicos", "#N/A", "Sí", "Sí", "Top 5%", "https://www.enel.cl/sostenibilidad", "Publicado", "2026-01"], ["Santiago", "CENCOSUD", "Cencosud", "Consumo Discrecional", "#N/A", "Sí", "Sí", "Industry Mover", "https://www.cencosud.com/sostenibilidad", "Publicado", "2026-02"], ["Santiago", "SQM-B", "SQM", "Materiales", "#N/A", "Sí", "Sí", "Member", "https://www.sqm.com/sostenibilidad", "Publicado", "2026-01"], ["bvc", "BCOLOMBIA", "Bancolombia", "Financiero", "#N/A", "Sí", "Sí", "Top 1%", "https://www.bancolombia.com/sostenibilidad", "Publicado", "2026-02"], ["bvc", "ISA", "Interconexión Eléctrica ISA", "Servicios Públicos", "#N/A", "Sí", "Sí", "Top 5%", "https://www.isa.co/sostenibilidad", "Publicado", "2026-02"], ["bvc", "NUTRESA", "Grupo Nutresa", "Consumo Básico", "#N/A", "Sí", "Sí", "Top 5%", "https://www.gruponutresa.com/sostenibilidad", "Publicado", "2026-02"], ["bvc", "GEB", "Grupo Energía Bogotá", "Servicios Públicos", "#N/A", "Sí", "Sí", "Member", "https://www.geb.com.co/sostenibilidad", "Publicado", "2026-01"], ["bvc", "ECOPETROL", "Ecopetrol", "Energía", "#N/A", "Sí", "Sí", "Member", "https://www.ecopetrol.com.co/sostenibilidad", "Publicado", "2026-02"], ["bvc", "GRUPOSURA", "Grupo Sura", "Financiero", "#N/A", "Sí", "Sí", "Member", "https://www.gruposura.com/sostenibilidad", "Publicado", "2026-01"], ["BMV", "GFNORTE", "Grupo Financiero Banorte", "Financiero", "191.06", "Sí", "Sí", "Top 5%", "https://investors.banorte.com/sostenibilidad", "Publicado", "2026-02"], ["BMV", "KOF", "Coca-Cola FEMSA", "Consumo Básico", "179.66", "Sí", "Sí", "Top 5%", "https://www.coca-colafemsa.com/sostenibilidad", "Publicado", "2026-02"], ["BMV", "CEMEX", "Cemex", "Materiales", "#N/A", "Sí", "Sí", "Top 10%", "https://www.cemex.com/sostenibilidad", "Publicado", "2026-02"], ["BMV", "WALMEX", "Walmart de México y CA", "Consumo Básico", "47.8", "Sí", "Sí", "Member", "https://www.walmex.mx/sostenibilidad", "Publicado", "2026-02"], ["BMV", "FEMSA", "Fomento Económico Mexicano", "Consumo Básico", "221.83", "Sí", "Sí", "Member", "https://www.femsa.com/sostenibilidad", "Publicado", "2026-01"], ["BMV", "AC", "Arca Continental", "Consumo Básico", "199.61", "Sí", "Sí", "Member", "https://www.arcacontal.com/sostenibilidad", "Publicado", "2026-02"], ["BMV", "AMX", "América Móvil", "Telecomunicaciones", "#N/A", "Sí", "No", "N/A", "https://www.americamovil.com/sostenibilidad", "Publicado", "2025-12"], ["BVL", "BAP", "Credicorp / BCP", "Financiero", "#N/A", "Sí", "Sí", "Member", "https://www.credicorp.com/sostenibilidad", "Publicado", "2026-02"], ["BVL", "IFS", "Intercorp Financial Services", "Financiero", "#N/A", "Sí", "Sí", "Member", "https://www.ifs.com.pe/sostenibilidad", "Publicado", "2026-02"], ["BVL", "FERREYC", "Ferreycorp", "Bienes de Capital", "#N/A", "Sí", "Sí", "Member", "https://www.ferreycorp.com.pe/sostenibilidad", "Publicado", "2026-01"], ["BVL", "CPACASC1", "Cementos Pacasmayo", "Materiales", "#N/A", "Sí", "Sí", "Industry Mover", "https://www.cementospacasmayo.com.pe", "Publicado", "2026-02"], ["BVL", "BVN", "Compañía de Minas Buenaventura", "Materiales", "#N/A", "Sí", "No", "N/A", "https://www.buenaventura.com/sostenibilidad", "Publicado", "2025-11"], ["JSE", "NCBFG", "NCB Financial Group", "Financiero", "JMD 32.50", "Sí", "No", "N/A", "https://www.myncb.com/sustainability", "Publicado", "2025-12"], ["JSE", "JMMBGL", "JMMB Group", "Financiero", "JMD 9.80", "Sí", "No", "N/A", "https://jmmb.com/esg", "Publicado", "2025-11"], ["JSE", "SJ", "Sagicor Group Jamaica", "Financiero", "JMD 45.00", "Sí", "No", "N/A", "https://www.sagicor.com/esg", "Publicado", "2025-12"], ["JSE", "SEP", "Seprod Limited", "Consumo Básico", "JMD 38.10", "Sí", "No", "N/A", "https://www.seprod.com/sustainability", "Publicado", "2025-10"]];
+  const baseRF = [["BYMA", "Plaza Logística", "BPO2O", "Verde", "🟢 Normal", "AA+(arg)", "Cumplimiento normal de repagos y métricas ambientales", "Emisión neta neutral en parques logísticos", "https://www.plazalogistica.com.ar", "2026-03"], ["BYMA", "YPF S.A.", "YCA6O", "Verde", "🟢 Normal", "A+(arg)", "Cupón al día, proyectos renovables operando al 100%", "Construcción de parques eólicos/solares", "https://www.ypf.com", "2026-03"], ["BYMA", "Genneia", "GN34O", "Verde", "🟢 Normal", "AA(arg)", "Excelente desempeño crediticio y generación limpia", "100% fondos destinados a energía eólica", "https://www.genneia.com.ar", "2026-03"], ["BYMA", "Telecom Argentina", "TLC10", "SLB", "🟢 Normal", "AA(arg)", "Cumplimiento de metas de eficiencia energética y renovables", "Incrementar uso de energía renovable al 50%", "https://institucional.personal.com.ar/sustentabilidad", "2026-03"], ["B3", "Suzano S.A.", "US86964W", "SLB", "🟢 Normal", "BBB-", "Monitoreo regular, cumplimiento adelantado de metas", "Reducción de intensidad de agua industrial 15%", "https://www.suzano.com.br", "2026-03"], ["B3", "Natura &Co", "US63884M", "SLB", "🟡 Observación", "BB+", "Revisión cercana de KPI de envases circulares", "45% de plástico reciclado post-consumo en envases", "https://www.naturaeco.com", "2026-03"], ["B3", "Light S.A.", "US532241", "Verde", "🔴 Alerta Default", "D", "En proceso de reestructuración / Recuperación Judicial", "Pérdidas no técnicas y proyectos de eficiencia", "https://www.light.com.br", "2026-03"], ["B3", "Rede D'Or", "US75734A", "Verde", "🟢 Normal", "BBB-", "Pagos al día y ampliación de hospitales certificados LEED", "Certificación ambiental en el 100% de nuevas sedes", "https://www.rededor.com.br", "2026-02"], ["Santiago", "Codelco", "US219876", "Sostenible", "🟡 Observación", "BBB+", "Revisión de perspectiva por ajuste en proyectos hídricos", "Reducción de 60% en consumo de agua fresca para 2030", "https://www.codelco.com", "2026-03"], ["Santiago", "Empresas CMPC", "CL000213", "Verde", "🟢 Normal", "BBB+", "Desempeño destacado en certificación FSC y reforestación", "100% celulosa certificada sostenible", "https://www.cmpc.com", "2026-03"], ["Santiago", "VTR Finance", "US918321", "SLB", "🔴 Alerta Default", "CC", "Riesgo de reestructuración de deuda / Periodo de gracia", "Capa de fibra óptica rural y eficiencia energética", "https://www.vtr.cl", "2026-03"], ["Santiago", "Banco Estado Chile", "CL000889", "Social", "🟢 Normal", "AAA (cl)", "Emisión social con alta demanda e impacto demostrado", "Financiamiento de vivienda social y microempresas", "https://www.bancoestado.cl", "2026-03"], ["bvc", "Bancolombia", "US05968L", "Sostenible", "🟢 Normal", "BB+", "Emisión sostenible destacada con alto repago", "Financiación de proyectos de energía solar y vivienda social", "https://www.bancolombia.com", "2026-03"], ["bvc", "Ecopetrol", "US279158", "Sostenible", "🟡 Observación", "BB+", "Seguimiento a metas de descarbonización por volatilidad de refinación", "Reducción de emisiones absolutas alcance 1 y 2 en 25%", "https://www.ecopetrol.com.co", "2026-03"], ["bvc", "Grupo Energía Bogotá", "CO000189", "Verde", "🟢 Normal", "AAA (col)", "Uso de fondos al 100% en líneas de transmisión renovable", "Conexión de parques eólicos en La Guajira", "https://www.geb.com.co", "2026-02"], ["BMV", "Cemex", "US151290", "SLB", "🟢 Normal", "BBB-", "Cumplimiento exitoso de KPI de emisión de CO2 por tonelada", "Cemento con bajo contenido de carbono (Vertua)", "https://www.cemex.com", "2026-03"], ["BMV", "CFE", "MX91CFE00", "Verde", "🟡 Observación", "BBB-", "Monitoreo de ejecución de proyectos hidroeléctricos", "Modernización de 16 plantas hidroeléctricas", "https://www.cfe.mx", "2026-03"], ["BMV", "TV Azteca / Elektra", "US88034P", "Sostenible", "🔴 Alerta Default", "D", "Conflicto legal con bonistas internacionales / Incumplimiento", "Inclusión digital en comunidades alejadas", "https://www.tvazteca.com", "2026-03"], ["BVL", "COFIDE", "US197022", "Sostenible", "🟢 Normal", "BBB-", "Fondo de desarrollo sostenible operando según prospecto", "Financiamiento a pymes lideradas por mujeres y proyectos verdes", "https://www.cofide.com.pe", "2026-03"], ["BVL", "Banco de Crédito del Perú", "US05971R", "Verde", "🟢 Normal", "BBB", "Colocación de cartera verde en transporte limpio e infraestructura", "Financiamiento de la Línea 2 del Metro de Lima", "https://www.viabcp.com", "2026-03"], ["BVL", "Hunt Oil Perú", "US445632", "SLB", "🟡 Observación", "BB+", "Seguimiento de meta de quema de gas (flaring)", "Cero quema rutinaria de gas en Camisea para 2027", "https://www.huntoil.com", "2026-02"], ["JSE", "TransJam Infrastructure", "JM000100", "Verde", "🟢 Normal", "A+(jm)", "Pagos regulares de peaje verde y conservación vial", "Reforestación y alumbrado solar en corredores viales", "https://www.transjamaican.com", "2026-03"]];
 
-            if (URL_CSV_RENTA_FIJA && URL_CSV_RENTA_FIJA.length > 10) {
-                Papa.parse(URL_CSV_RENTA_FIJA, {
-                    download: true,
-                    header: false,
-                    skipEmptyLines: true,
-                    complete: function(results) {
-                        datosRF = procesarFilasRF(results.data);
-                        renderizarTablaRF(datosRF);
-                    },
-                    error: function() { usarFallbackRF(); }
-                });
-            } else {
-                usarFallbackRF();
-            }
-        }
+  const MONEDA_POR_MERCADO = { BYMA:"ARS", B3:"BRL", Santiago:"CLP", bvc:"COP", BMV:"MXN", BVL:"PEN", JSE:"JMD" };
+  const LOCALE_POR_MERCADO = { BYMA:"es-AR", B3:"pt-BR", Santiago:"es-CL", bvc:"es-CO", BMV:"es-MX", BVL:"es-PE", JSE:"en-JM" };
 
-        function usarFallbackRV() {
-            datosRV = demoRV.map(row => ({
-                mercado: row[0], ticker: row[1], empresa: row[2], sector: row[3], precio: row[4],
-                indiceLocal: row[5], spYearbook: row[6], categoriaSP: row[7], reporte: row[8]
-            }));
-            renderizarTablaRV(datosRV);
-        }
+  let datosRV = [];
+  let datosRF = [];
 
-        function usarFallbackRF() {
-            datosRF = demoRF.map(row => ({
-                mercado: row[0], emisor: row[1], bono: row[2], tipo: row[3],
-                estado: row[4], rating: row[5], alerta: row[6], kpi: row[7]
-            }));
-            renderizarTablaRF(datosRF);
-        }
+  function switchTab(tab) {
+    document.getElementById('tab-rv').classList.toggle('hidden', tab !== 'rv');
+    document.getElementById('tab-rf').classList.toggle('hidden', tab !== 'rf');
+    document.getElementById('btn-rv').className = (tab === 'rv' ? 'tab-active' : 'tab-inactive') + ' flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors hover:bg-white';
+    document.getElementById('btn-rf').className = (tab === 'rf' ? 'tab-active' : 'tab-inactive') + ' flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors hover:bg-white';
+    document.getElementById('sectorFilter').classList.toggle('hidden', tab !== 'rv');
+    document.getElementById('tipoBonoFilter').classList.toggle('hidden', tab !== 'rf');
+    document.getElementById('estadoRiesgoFilter').classList.toggle('hidden', tab !== 'rf');
+  }
 
-        function procesarFilasRV(rows) {
-            const list = [];
-            const mercadosValidos = ['BYMA', 'B3', 'Santiago', 'bvc', 'BMV', 'BVL', 'JSE'];
-            rows.forEach(r => {
-                if (!r || r.length < 3) return;
-                const m = (r[0] || '').trim();
-                if (mercadosValidos.includes(m)) {
-                    list.push({
-                        mercado: m, ticker: r[1] || '', empresa: r[2] || '', sector: r[3] || '', precio: r[4] || '-',
-                        indiceLocal: r[5] || '', spYearbook: r[6] || '', categoriaSP: r[7] || '', reporte: r[8] || ''
-                    });
-                }
-            });
-            return list.length > 0 ? list : demoRV.map(row => ({
-                mercado: row[0], ticker: row[1], empresa: row[2], sector: row[3], precio: row[4],
-                indiceLocal: row[5], spYearbook: row[6], categoriaSP: row[7], reporte: row[8]
-            }));
-        }
+  function cargarDatos() {
+    if (URL_CSV_RENTA_VARIABLE && URL_CSV_RENTA_VARIABLE.length > 10) {
+      Papa.parse(URL_CSV_RENTA_VARIABLE, { download: true, header:false, skipEmptyLines:true,
+        complete: r => { datosRV = procesarFilas(r.data, 'rv'); postCargaRV(); },
+        error: () => { datosRV = procesarFilas(baseRV, 'rv'); postCargaRV(); } });
+    } else { datosRV = procesarFilas(baseRV, 'rv'); postCargaRV(); }
 
-        function procesarFilasRF(rows) {
-            const list = [];
-            const mercadosValidos = ['BYMA', 'B3', 'Santiago', 'bvc', 'BMV', 'BVL', 'JSE'];
-            rows.forEach(r => {
-                if (!r || r.length < 3) return;
-                const m = (r[0] || '').trim();
-                if (mercadosValidos.includes(m)) {
-                    list.push({
-                        mercado: m, emisor: r[1] || '', bono: r[2] || '', tipo: r[3] || '',
-                        estado: r[4] || '', rating: r[5] || '', alerta: r[6] || '', kpi: r[7] || ''
-                    });
-                }
-            });
-            return list.length > 0 ? list : demoRF.map(row => ({
-                mercado: row[0], emisor: row[1], bono: row[2], tipo: row[3],
-                estado: row[4], rating: row[5], alerta: row[6], kpi: row[7]
-            }));
-        }
+    if (URL_CSV_RENTA_FIJA && URL_CSV_RENTA_FIJA.length > 10) {
+      Papa.parse(URL_CSV_RENTA_FIJA, { download: true, header:false, skipEmptyLines:true,
+        complete: r => { datosRF = procesarFilas(r.data, 'rf'); postCargaRF(); },
+        error: () => { datosRF = procesarFilas(baseRF, 'rf'); postCargaRF(); } });
+    } else { datosRF = procesarFilas(baseRF, 'rf'); postCargaRF(); }
+  }
 
-        function renderizarTablaRV(data) {
-            const tbody = document.getElementById('rv-table-body');
-            tbody.innerHTML = '';
-            data.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/50 transition-colors";
-                const isSP = item.spYearbook === 'Sí';
-                const spBadge = isSP 
-                    ? '<span class="px-2.5 py-1 text-xs border rounded-full font-medium bg-emerald-900/50 text-emerald-400 border-emerald-800">Sí</span>'
-                    : '<span class="px-2.5 py-1 text-xs border rounded-full font-medium bg-slate-800 text-slate-400 border-slate-700">No</span>';
+  const MERCADOS_VALIDOS = ['BYMA','B3','Santiago','bvc','BMV','BVL','JSE'];
 
-                tr.innerHTML = `
-                    <td class="p-4"><span class="px-2 py-1 bg-slate-800 rounded-md text-xs font-medium">${item.mercado}</span></td>
-                    <td class="p-4"><div class="font-bold text-white">${item.ticker}</div><div class="text-xs text-slate-400">${item.empresa}</div></td>
-                    <td class="p-4 text-slate-300">${item.sector}</td>
-                    <td class="p-4 text-right font-mono text-emerald-400 font-medium">${item.precio}</td>
-                    <td class="p-4 text-center">${item.indiceLocal === 'Sí' ? '<span class="text-emerald-400 font-bold">✓</span>' : '-'}</td>
-                    <td class="p-4 text-center">${spBadge}</td>
-                    <td class="p-4 text-center text-slate-300 text-xs">${item.categoriaSP}</td>
-                    <td class="p-4 text-center">${item.reporte ? `<a href="${item.reporte}" target="_blank" class="text-emerald-400 hover:underline text-xs">Ver Reporte ↗</a>` : '-'}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+  function procesarFilas(rows, tipo) {
+    const list = [];
+    rows.forEach(r => {
+      if (!r || r.length < 3) return;
+      const m = (r[0] || '').trim();
+      if (!MERCADOS_VALIDOS.includes(m)) return;
+      if (tipo === 'rv') {
+        list.push({ mercado:m, ticker:r[1]||'', empresa:r[2]||'', sector:r[3]||'', precio:r[4]||'',
+          indiceLocal:r[5]||'', spYearbook:r[6]||'', categoriaSP:r[7]||'', reporte:r[8]||'',
+          estadoReporte:r[9]||'', ultimaAct:r[10]||'' });
+      } else {
+        list.push({ mercado:m, emisor:r[1]||'', bono:r[2]||'', tipo:r[3]||'', estado:r[4]||'',
+          rating:r[5]||'', alerta:r[6]||'', kpi:r[7]||'', enlaceDoc:r[8]||'', fechaRevision:r[9]||'' });
+      }
+    });
+    return list;
+  }
 
-        function renderizarTablaRF(data) {
-            const tbody = document.getElementById('rf-table-body');
-            tbody.innerHTML = '';
-            data.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/50 transition-colors";
-                
-                let riesgoStyle = "bg-slate-800 text-slate-400 border-slate-700";
-                if (item.estado.includes('Normal')) riesgoStyle = "bg-emerald-900/50 text-emerald-400 border-emerald-800";
-                if (item.estado.includes('Observación')) riesgoStyle = "bg-yellow-900/50 text-yellow-400 border-yellow-800";
-                if (item.estado.includes('Alerta')) riesgoStyle = "bg-red-900/50 text-red-400 border-red-800";
+  function postCargaRV() {
+    poblarSectorFilter();
+    actualizarKPIs();
+    filterData();
+  }
+  function postCargaRF() {
+    poblarTipoBonoFilter();
+    actualizarKPIs();
+    filterData();
+  }
 
-                tr.innerHTML = `
-                    <td class="p-4"><span class="px-2 py-1 bg-slate-800 rounded-md text-xs font-medium">${item.mercado}</span></td>
-                    <td class="p-4"><div class="font-bold text-white">${item.bono}</div><div class="text-xs text-slate-400">${item.emisor}</div></td>
-                    <td class="p-4"><span class="px-2 py-1 bg-slate-800 rounded text-xs text-slate-300">${item.tipo}</span></td>
-                    <td class="p-4 text-center"><span class="px-2.5 py-1 text-xs border rounded-full font-medium ${riesgoStyle}">${item.estado}</span></td>
-                    <td class="p-4 text-slate-300 text-xs">${item.alerta}</td>
-                    <td class="p-4 text-slate-300 text-xs">${item.kpi}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
+  function poblarSectorFilter() {
+    const select = document.getElementById('sectorFilter');
+    const actuales = new Set(Array.from(select.options).map(o => o.value));
+    const sectores = [...new Set(datosRV.map(i => i.sector).filter(Boolean))].sort();
+    sectores.forEach(s => { if (!actuales.has(s)) { const o = document.createElement('option'); o.value = s; o.textContent = s; select.appendChild(o); } });
+  }
+  function poblarTipoBonoFilter() {
+    const select = document.getElementById('tipoBonoFilter');
+    const actuales = new Set(Array.from(select.options).map(o => o.value));
+    const tipos = [...new Set(datosRF.map(i => i.tipo).filter(Boolean))].sort();
+    tipos.forEach(t => { if (!actuales.has(t)) { const o = document.createElement('option'); o.value = t; o.textContent = t; select.appendChild(o); } });
+  }
 
-        function filterData() {
-            const text = document.getElementById('searchInput').value.toLowerCase();
-            const market = document.getElementById('marketFilter').value;
+  function actualizarKPIs() {
+    document.getElementById('kpi-acciones').textContent = datosRV.length || '—';
+    document.getElementById('kpi-spyearbook').textContent = datosRV.filter(i => i.spYearbook === 'Sí').length || '—';
+    document.getElementById('kpi-bonos').textContent = datosRF.length || '—';
+    document.getElementById('kpi-alerta').textContent = datosRF.filter(i => i.estado.includes('Alerta')).length || '0';
+  }
 
-            const fRV = datosRV.filter(i => {
-                const matchM = market === 'ALL' || i.mercado === market;
-                const matchT = i.ticker.toLowerCase().includes(text) || i.empresa.toLowerCase().includes(text);
-                return matchM && matchT;
-            });
-            renderizarTablaRV(fRV);
+  function formatPrecio(mercado, precioRaw) {
+    if (!precioRaw || precioRaw === '#N/A' || precioRaw === 'N/A') return '<span class="text-[#9ba1a5]">N/D</span>';
+    if (/[A-Za-z]/.test(precioRaw)) return precioRaw; // ya viene con moneda (ej. JSE)
+    const num = parseFloat(precioRaw);
+    if (isNaN(num)) return '<span class="text-[#9ba1a5]">N/D</span>';
+    const moneda = MONEDA_POR_MERCADO[mercado] || '';
+    const locale = LOCALE_POR_MERCADO[mercado] || 'es-AR';
+    try {
+      return moneda + ' ' + num.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    } catch (e) { return moneda + ' ' + num.toFixed(2); }
+  }
 
-            const fRF = datosRF.filter(i => {
-                const matchM = market === 'ALL' || i.mercado === market;
-                const matchT = i.bono.toLowerCase().includes(text) || i.emisor.toLowerCase().includes(text);
-                return matchM && matchT;
-            });
-            renderizarTablaRF(fRF);
-        }
+  function renderizarTablaRV(data) {
+    const tbody = document.getElementById('rv-table-body');
+    tbody.innerHTML = '';
+    data.forEach(item => {
+      const tr = document.createElement('tr');
+      const isSP = item.spYearbook === 'Sí';
+      const spBadge = isSP
+        ? '<span class="px-2.5 py-1 text-xs rounded-full font-medium" style="background:var(--cap-teal-20);color:#09193a">Sí</span>'
+        : '<span class="px-2.5 py-1 text-xs rounded-full font-medium" style="background:var(--cap-gray-10);color:#9ba1a5">No</span>';
+      const categoria = (item.categoriaSP && item.categoriaSP !== 'N/A') ? item.categoriaSP : '—';
+      tr.innerHTML = `
+        <td class="p-3.5"><span class="px-2 py-1 rounded-md text-xs font-medium" style="background:var(--cap-violet-10);color:#696484">${item.mercado}</span></td>
+        <td class="p-3.5"><div class="font-semibold text-[#09193a]">${item.ticker}</div><div class="text-xs text-[#9ba1a5]">${item.empresa}</div></td>
+        <td class="p-3.5 text-[#09193a]">${item.sector}</td>
+        <td class="p-3.5 text-right font-mono text-sm text-[#09193a]">${formatPrecio(item.mercado, item.precio)}</td>
+        <td class="p-3.5 text-center">${item.indiceLocal === 'Sí' ? '<span class="text-[#60afc1] font-bold">✓</span>' : '<span class="text-[#9ba1a5]">—</span>'}</td>
+        <td class="p-3.5 text-center">${spBadge}</td>
+        <td class="p-3.5 text-center text-xs text-[#696484]">${categoria}</td>
+        <td class="p-3.5">
+          ${item.reporte ? `<a href="${item.reporte}" target="_blank" rel="noopener" class="text-[#60afc1] hover:underline text-xs font-medium">Ver reporte ↗</a>` : '<span class="text-[#9ba1a5] text-xs">—</span>'}
+          <div class="text-[10px] text-[#9ba1a5] mt-0.5">${item.estadoReporte || ''}${item.ultimaAct ? ' · ' + item.ultimaAct : ''}</div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+    document.getElementById('rv-count').textContent = data.length + ' de ' + datosRV.length + ' acciones';
+  }
 
-        window.onload = cargarDatos;
-    </script>
+  function renderizarTablaRF(data) {
+    const tbody = document.getElementById('rf-table-body');
+    tbody.innerHTML = '';
+    data.forEach(item => {
+      const tr = document.createElement('tr');
+      let style = 'background:var(--cap-gray-10);color:#9ba1a5';
+      if (item.estado.includes('Normal')) style = 'background:var(--cap-teal-20);color:#09193a';
+      if (item.estado.includes('Observación')) style = 'background:var(--cap-gold-20);color:#09193a';
+      if (item.estado.includes('Alerta')) style = 'background:var(--cap-coral-10);color:#e76f51';
+      tr.innerHTML = `
+        <td class="p-3.5"><span class="px-2 py-1 rounded-md text-xs font-medium" style="background:var(--cap-violet-10);color:#696484">${item.mercado}</span></td>
+        <td class="p-3.5"><div class="font-semibold text-[#09193a]">${item.emisor}</div><div class="text-xs text-[#9ba1a5]">${item.bono}</div></td>
+        <td class="p-3.5"><span class="px-2 py-1 rounded text-xs" style="background:var(--cap-teal-10);color:#09193a">${item.tipo}</span></td>
+        <td class="p-3.5 text-center"><span class="px-2.5 py-1 text-xs rounded-full font-medium" style="${style}">${item.estado}</span></td>
+        <td class="p-3.5 text-center text-xs font-mono text-[#09193a]">${item.rating}</td>
+        <td class="p-3.5 text-[#09193a] text-xs">${item.alerta}</td>
+        <td class="p-3.5 text-[#09193a] text-xs">${item.kpi}</td>
+        <td class="p-3.5">
+          ${item.enlaceDoc ? `<a href="${item.enlaceDoc}" target="_blank" rel="noopener" class="text-[#60afc1] hover:underline text-xs font-medium">Ver documentación ↗</a>` : '<span class="text-[#9ba1a5] text-xs">—</span>'}
+          <div class="text-[10px] text-[#9ba1a5] mt-0.5">${item.fechaRevision || ''}</div>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+    document.getElementById('rf-count').textContent = data.length + ' de ' + datosRF.length + ' bonos';
+  }
+
+  function filterData() {
+    const text = document.getElementById('searchInput').value.toLowerCase();
+    const market = document.getElementById('marketFilter').value;
+    const sector = document.getElementById('sectorFilter').value;
+    const tipoBono = document.getElementById('tipoBonoFilter').value;
+    const estadoRiesgo = document.getElementById('estadoRiesgoFilter').value;
+
+    const fRV = datosRV.filter(i => {
+      const matchM = market === 'ALL' || i.mercado === market;
+      const matchS = sector === 'ALL' || i.sector === sector;
+      const matchT = i.ticker.toLowerCase().includes(text) || i.empresa.toLowerCase().includes(text);
+      return matchM && matchS && matchT;
+    });
+    renderizarTablaRV(fRV);
+
+    const fRF = datosRF.filter(i => {
+      const matchM = market === 'ALL' || i.mercado === market;
+      const matchTipo = tipoBono === 'ALL' || i.tipo === tipoBono;
+      const matchEstado = estadoRiesgo === 'ALL' || i.estado.includes(estadoRiesgo);
+      const matchT = i.bono.toLowerCase().includes(text) || i.emisor.toLowerCase().includes(text);
+      return matchM && matchTipo && matchEstado && matchT;
+    });
+    renderizarTablaRF(fRF);
+  }
+
+  window.onload = cargarDatos;
+</script>
 </body>
 </html>
