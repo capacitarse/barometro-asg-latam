@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen pb-12">
 
     <!-- Header -->
     <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
@@ -24,6 +24,11 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Banner de Estado de Conexión -->
+        <div id="status-banner" class="hidden mb-6 p-3 rounded-lg text-xs font-medium bg-amber-900/40 border border-amber-700/50 text-amber-300 flex justify-between items-center">
+            <span>⚠️ Mostrando datos demo. Para conectar tu Google Sheets real, edita las variables de enlace en <code>index.html</code>.</span>
+        </div>
+
         <!-- Buscador y Filtros -->
         <div class="flex flex-col sm:flex-row gap-4 mb-6">
             <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Buscar por Ticker, Empresa o Emisor..." class="bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2.5 w-full sm:w-80 focus:outline-none focus:border-emerald-500">
@@ -50,7 +55,7 @@
                         </tr>
                     </thead>
                     <tbody id="rv-table-body" class="divide-y divide-slate-800 text-sm">
-                        <!-- Se llena dinámicamente con Google Sheets -->
+                        <!-- Carga dinámica -->
                     </tbody>
                 </table>
             </div>
@@ -71,183 +76,233 @@
                         </tr>
                     </thead>
                     <tbody id="rf-table-body" class="divide-y divide-slate-800 text-sm">
-                        <!-- Se llena dinámicamente con Google Sheets -->
+                        <!-- Carga dinámica -->
                     </tbody>
                 </table>
             </div>
         </div>
     </main>
 
-   <script>
-        // PEGA AQUÍ TUS ENLACES DE GOOGLE SHEETS
+    <script>
+        // ------------------------------------------------------------------
+        // ENLACES GOOGLE SHEETS (CSV PUBLICADO)
+        // Sustituye estas URLs cuando tengas tus links de "Publicar en la web"
+        // ------------------------------------------------------------------
         const URL_CSV_RENTA_VARIABLE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRniAeWLI97k7vcn5TzlBg0n89Ird3Rb-619RqXvHTEJ-aIniWGzsCIKrYWt0fX_Q/pub?gid=373182793&single=true&output=csv";
         const URL_CSV_RENTA_FIJA = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRniAeWLI97k7vcn5TzlBg0n89Ird3Rb-619RqXvHTEJ-aIniWGzsCIKrYWt0fX_Q/pub?gid=2120126879&single=true&output=csv";
 
-        // Variables globales para guardar los datos
+        // Datos fallback (demo) para que la página siempre muestre información
+        const demoRV = [
+            ["BYMA", "YPFD", "YPF S.A.", "Energía", "Sí", "Sí", "Industry Mover", "https://www.ypf.com/sustentabilidad"],
+            ["BYMA", "ALUA", "Aluar Arg. de Aluminio", "Materiales", "Sí", "No", "N/A", "https://www.aluar.com.ar"],
+            ["BYMA", "GGAL", "Grupo Financiero Galicia", "Financiero", "Sí", "Sí", "Member", "https://www.galicia.ar"],
+            ["BYMA", "PAMP", "Pampa Energía", "Servicios Públicos", "Sí", "Sí", "Member", "https://www.pampaenergia.com"],
+            ["Santiago", "CMPC", "Empresas CMPC", "Materiales", "Sí", "Sí", "Top 1%", "https://www.cmpc.com"],
+            ["Santiago", "AGUAS-A", "Aguas Andinas", "Servicios Públicos", "Sí", "Sí", "Top 5%", "https://www.aguasandinas.cl"],
+            ["Santiago", "BSANTANDER", "Banco Santander Chile", "Financiero", "Sí", "Sí", "Top 10%", "https://www.santander.cl"],
+            ["Santiago", "SQM-B", "SQM", "Materiales", "Sí", "Sí", "Member", "https://www.sqm.com"]
+        ];
+
+        const demoRF = [
+            ["BYMA", "Plaza Logística", "BPO2O", "Verde", "🟢 Normal", "AA+(arg)", "Cumplimiento normal de repagos", "Emisión neta neutral en parques"],
+            ["BYMA", "YPF S.A.", "YCA6O", "Verde", "🟢 Normal", "A+(arg)", "Cupón al día, proyectos parque eólico 100%", "Construcción parque solar/eólico"],
+            ["BYMA", "Empresa Ejemplo AR", "EXAR1", "SLB", "🔴 Alerta Default", "CCC", "Aumento inusual de spreads, mora en auditoría", "Reducción 20% intensidad carbono (Incumplido)"],
+            ["Santiago", "Codelco", "US219876", "Sostenible", "🟡 Observación", "BBB+", "Revisión perspectiva por retraso proyectos agua", "Reducción 60% agua fresca 2030"],
+            ["Santiago", "VTR Finance", "US918321", "SLB", "🔴 Alerta Default", "CC", "Riesgo reestructuración deuda / periodo gracia", "Fibra óptica rural y eficiencia energética"],
+            ["Santiago", "Banco Estado Chile", "CL000889", "Social", "🟢 Normal", "AAA (cl)", "Emisión social con alto impacto social", "Financiamiento vivienda y micropymes"]
+        ];
+
         let datosRV = [];
         let datosRF = [];
 
-        // Función para cambiar de pestaña
         function switchTab(tab) {
             document.getElementById('tab-rv').classList.toggle('hidden', tab !== 'rv');
             document.getElementById('tab-rf').classList.toggle('hidden', tab !== 'rf');
             
             document.getElementById('btn-rv').className = tab === 'rv' 
                 ? 'px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-lg' 
-                : 'px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors';
+                : 'px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-300 hover:bg-slate-700';
             
             document.getElementById('btn-rf').className = tab === 'rf' 
                 ? 'px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-lg' 
-                : 'px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors';
+                : 'px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-300 hover:bg-slate-700';
         }
 
-        // Cargar datos de Renta Variable
-        function cargarRentaVariable() {
-            Papa.parse(URL_CSV_RENTA_VARIABLE, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    datosRV = results.data;
-                    renderizarTablaRV(datosRV);
+        function cargarDatos() {
+            let cargadoRV = false;
+            let cargadoRF = false;
+
+            if (URL_CSV_RENTA_VARIABLE && URL_CSV_RENTA_VARIABLE.length > 10) {
+                Papa.parse(URL_CSV_RENTA_VARIABLE, {
+                    download: true,
+                    header: false,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        datosRV = procesarFilasRV(results.data);
+                        renderizarTablaRV(datosRV);
+                        cargadoRV = true;
+                    },
+                    error: function() { usarFallbackRV(); }
+                });
+            } else {
+                usarFallbackRV();
+            }
+
+            if (URL_CSV_RENTA_FIJA && URL_CSV_RENTA_FIJA.length > 10) {
+                Papa.parse(URL_CSV_RENTA_FIJA, {
+                    download: true,
+                    header: false,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        datosRF = procesarFilasRF(results.data);
+                        renderizarTablaRF(datosRF);
+                        cargadoRF = true;
+                    },
+                    error: function() { usarFallbackRF(); }
+                });
+            } else {
+                usarFallbackRF();
+            }
+        }
+
+        function usarFallbackRV() {
+            datosRV = demoRV.map(row => ({
+                mercado: row[0], ticker: row[1], empresa: row[2], sector: row[3],
+                indiceLocal: row[4], spYearbook: row[5], categoriaSP: row[6], reporte: row[7]
+            }));
+            renderizarTablaRV(datosRV);
+            mostrarBannerDemo();
+        }
+
+        function usarFallbackRF() {
+            datosRF = demoRF.map(row => ({
+                mercado: row[0], emisor: row[1], bono: row[2], tipo: row[3],
+                estado: row[4], rating: row[5], alerta: row[6], kpi: row[7]
+            }));
+            renderizarTablaRF(datosRF);
+            mostrarBannerDemo();
+        }
+
+        function mostrarBannerDemo() {
+            document.getElementById('status-banner').classList.remove('hidden');
+        }
+
+        function procesarFilasRV(rows) {
+            const list = [];
+            rows.forEach(r => {
+                if (!r || r.length < 3) return;
+                const m = (r[0] || '').trim();
+                if (m === 'BYMA' || m === 'Santiago') {
+                    list.push({
+                        mercado: m,
+                        ticker: r[1] || '',
+                        empresa: r[2] || '',
+                        sector: r[3] || '',
+                        indiceLocal: r[4] || '',
+                        spYearbook: r[5] || '',
+                        categoriaSP: r[6] || '',
+                        reporte: r[7] || ''
+                    });
                 }
             });
+            return list.length > 0 ? list : demoRV.map(row => ({
+                mercado: row[0], ticker: row[1], empresa: row[2], sector: row[3],
+                indiceLocal: row[4], spYearbook: row[5], categoriaSP: row[6], reporte: row[7]
+            }));
         }
 
-        // Cargar datos de Renta Fija
-        function cargarRentaFija() {
-            Papa.parse(URL_CSV_RENTA_FIJA, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    datosRF = results.data;
-                    renderizarTablaRF(datosRF);
+        function procesarFilasRF(rows) {
+            const list = [];
+            rows.forEach(r => {
+                if (!r || r.length < 3) return;
+                const m = (r[0] || '').trim();
+                if (m === 'BYMA' || m === 'Santiago') {
+                    list.push({
+                        mercado: m,
+                        emisor: r[1] || '',
+                        bono: r[2] || '',
+                        tipo: r[3] || '',
+                        estado: r[4] || '',
+                        rating: r[5] || '',
+                        alerta: r[6] || '',
+                        kpi: r[7] || ''
+                    });
                 }
             });
+            return list.length > 0 ? list : demoRF.map(row => ({
+                mercado: row[0], emisor: row[1], bono: row[2], tipo: row[3],
+                estado: row[4], rating: row[5], alerta: row[6], kpi: row[7]
+            }));
         }
 
-        // Renderizar Renta Variable
-        function renderizarTablaRV(datos) {
+        function renderizarTablaRV(data) {
             const tbody = document.getElementById('rv-table-body');
-            tbody.innerHTML = ''; // Limpiar tabla
-
-            // Solo tomar los datos a partir de la fila 4 (donde empiezan los datos reales)
-            // Asumiendo que PapaParse detectó las filas 1, 2 y 3 como cabeceras, saltamos las primeras si es necesario.
-            // Para simplificar, buscaremos las columnas que tengan contenido válido (ej. Mercado no vacío y no sea "Mercado")
-            
-            datos.forEach(fila => {
-                const mercado = fila['Mercado'] || fila['MATRIZ DE RENTA VARIABLE ESG — BYMA & SANTIAGO']; 
-                // Ajuste necesario porque las primeras filas del Sheets tienen títulos combinados.
-                
-                // Filtro de seguridad para no pintar filas vacías o los títulos del dashboard
-                if (!mercado || mercado === 'Mercado' || !fila['Ticker']) return;
-
+            tbody.innerHTML = '';
+            data.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-800/50 transition-colors";
-                
-                // Lógica de colores (Badge)
-                const isSP = fila['S&P Yearbook'] === 'Sí';
-                const spColor = isSP ? 'bg-emerald-900/50 text-emerald-400 border-emerald-800' : 'bg-slate-800 text-slate-400 border-slate-700';
+                const isSP = item.spYearbook === 'Sí';
+                const spBadge = isSP 
+                    ? '<span class="px-2.5 py-1 text-xs border rounded-full font-medium bg-emerald-900/50 text-emerald-400 border-emerald-800">Sí</span>'
+                    : '<span class="px-2.5 py-1 text-xs border rounded-full font-medium bg-slate-800 text-slate-400 border-slate-700">No</span>';
 
                 tr.innerHTML = `
-                    <td class="p-4"><span class="px-2 py-1 bg-slate-800 rounded-md text-xs font-medium">${mercado}</span></td>
-                    <td class="p-4">
-                        <div class="font-bold text-white">${fila['Ticker']}</div>
-                        <div class="text-xs text-slate-400">${fila['Empresa']}</div>
-                    </td>
-                    <td class="p-4 text-slate-300">${fila['Sector GICS'] || ''}</td>
-                    <td class="p-4 text-center">
-                        ${fila['Índice Local ESG'] === 'Sí' ? '<span class="text-emerald-400">✓</span>' : '-'}
-                    </td>
-                    <td class="p-4 text-center">
-                        <span class="px-2.5 py-1 text-xs border rounded-full font-medium ${spColor}">
-                            ${fila['S&P Yearbook'] || 'No'}
-                        </span>
-                    </td>
-                    <td class="p-4 text-center text-slate-300 text-xs">${fila['Categoría S&P'] || '-'}</td>
-                    <td class="p-4 text-center">
-                        ${fila['Reporte ESG / Memoria'] ? `<a href="${fila['Reporte ESG / Memoria']}" target="_blank" class="text-blue-400 hover:text-blue-300 underline text-xs">Ver Reporte</a>` : '-'}
-                    </td>
+                    <td class="p-4"><span class="px-2 py-1 bg-slate-800 rounded-md text-xs font-medium">${item.mercado}</span></td>
+                    <td class="p-4"><div class="font-bold text-white">${item.ticker}</div><div class="text-xs text-slate-400">${item.empresa}</div></td>
+                    <td class="p-4 text-slate-300">${item.sector}</td>
+                    <td class="p-4 text-center">${item.indiceLocal === 'Sí' ? '<span class="text-emerald-400 font-bold">✓</span>' : '-'}</td>
+                    <td class="p-4 text-center">${spBadge}</td>
+                    <td class="p-4 text-center text-slate-300 text-xs">${item.categoriaSP}</td>
+                    <td class="p-4 text-center">${item.reporte ? `<a href="${item.reporte}" target="_blank" class="text-emerald-400 hover:underline text-xs">Ver Reporte ↗</a>` : '-'}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // Renderizar Renta Fija
-        function renderizarTablaRF(datos) {
+        function renderizarTablaRF(data) {
             const tbody = document.getElementById('rf-table-body');
             tbody.innerHTML = '';
-
-            datos.forEach(fila => {
-                const mercado = fila['Mercado'] || fila['RADAR DE BONOS ESG & ALERTAS DE RIESGO'];
-                
-                if (!mercado || mercado === 'Mercado' || !fila['Bono / ISIN']) return;
-
+            data.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-800/50 transition-colors";
-
-                // Semáforo de Riesgo
-                let riesgoClass = "bg-slate-800 text-slate-400";
-                const estado = fila['Estado de Riesgo'] || '';
-                if (estado.includes('Normal')) riesgoClass = "bg-emerald-900/50 text-emerald-400 border border-emerald-800";
-                if (estado.includes('Observación')) riesgoClass = "bg-yellow-900/50 text-yellow-400 border border-yellow-800";
-                if (estado.includes('Alerta')) riesgoClass = "bg-red-900/50 text-red-400 border border-red-800";
+                
+                let riesgoStyle = "bg-slate-800 text-slate-400 border-slate-700";
+                if (item.estado.includes('Normal')) riesgoStyle = "bg-emerald-900/50 text-emerald-400 border-emerald-800";
+                if (item.estado.includes('Observación')) riesgoStyle = "bg-yellow-900/50 text-yellow-400 border-yellow-800";
+                if (item.estado.includes('Alerta')) riesgoStyle = "bg-red-900/50 text-red-400 border-red-800";
 
                 tr.innerHTML = `
-                    <td class="p-4"><span class="px-2 py-1 bg-slate-800 rounded-md text-xs font-medium">${mercado}</span></td>
-                    <td class="p-4">
-                        <div class="font-bold text-white">${fila['Bono / ISIN']}</div>
-                        <div class="text-xs text-slate-400">${fila['Emisor']}</div>
-                    </td>
-                    <td class="p-4 text-slate-300"><span class="px-2 py-1 bg-slate-800 rounded text-xs">${fila['Tipo de Bono'] || '-'}</span></td>
-                    <td class="p-4 text-center">
-                        <span class="px-2.5 py-1 text-xs rounded-full font-medium ${riesgoClass}">
-                            ${estado}
-                        </span>
-                    </td>
-                    <td class="p-4 text-slate-300 text-xs">${fila['Indicador / Alerta de Mercado'] || '-'}</td>
-                    <td class="p-4 text-slate-300 text-xs">${fila['KPI Sostenibilidad / Covenant'] || '-'}</td>
+                    <td class="p-4"><span class="px-2 py-1 bg-slate-800 rounded-md text-xs font-medium">${item.mercado}</span></td>
+                    <td class="p-4"><div class="font-bold text-white">${item.bono}</div><div class="text-xs text-slate-400">${item.emisor}</div></td>
+                    <td class="p-4"><span class="px-2 py-1 bg-slate-800 rounded text-xs text-slate-300">${item.tipo}</span></td>
+                    <td class="p-4 text-center"><span class="px-2.5 py-1 text-xs border rounded-full font-medium ${riesgoStyle}">${item.estado}</span></td>
+                    <td class="p-4 text-slate-300 text-xs">${item.alerta}</td>
+                    <td class="p-4 text-slate-300 text-xs">${item.kpi}</td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // Buscador y Filtros
         function filterData() {
-            const searchText = document.getElementById('searchInput').value.toLowerCase();
-            const marketFilter = document.getElementById('marketFilter').value;
+            const text = document.getElementById('searchInput').value.toLowerCase();
+            const market = document.getElementById('marketFilter').value;
 
-            // Filtrar Renta Variable
-            const filteredRV = datosRV.filter(fila => {
-                const mercado = fila['Mercado'] || fila['MATRIZ DE RENTA VARIABLE ESG — BYMA & SANTIAGO'] || '';
-                if (mercado === 'Mercado' || !fila['Ticker']) return false;
-
-                const matchMarket = marketFilter === 'ALL' || mercado.includes(marketFilter);
-                const matchSearch = (fila['Ticker'] && fila['Ticker'].toLowerCase().includes(searchText)) || 
-                                    (fila['Empresa'] && fila['Empresa'].toLowerCase().includes(searchText));
-                
-                return matchMarket && matchSearch;
+            const fRV = datosRV.filter(i => {
+                const matchM = market === 'ALL' || i.mercado === market;
+                const matchT = i.ticker.toLowerCase().includes(text) || i.empresa.toLowerCase().includes(text);
+                return matchM && matchT;
             });
-            renderizarTablaRV(filteredRV);
+            renderizarTablaRV(fRV);
 
-            // Filtrar Renta Fija
-            const filteredRF = datosRF.filter(fila => {
-                const mercado = fila['Mercado'] || fila['RADAR DE BONOS ESG & ALERTAS DE RIESGO'] || '';
-                if (mercado === 'Mercado' || !fila['Bono / ISIN']) return false;
-
-                const matchMarket = marketFilter === 'ALL' || mercado.includes(marketFilter);
-                const matchSearch = (fila['Bono / ISIN'] && fila['Bono / ISIN'].toLowerCase().includes(searchText)) || 
-                                    (fila['Emisor'] && fila['Emisor'].toLowerCase().includes(searchText));
-                
-                return matchMarket && matchSearch;
+            const fRF = datosRF.filter(i => {
+                const matchM = market === 'ALL' || i.mercado === market;
+                const matchT = i.bono.toLowerCase().includes(text) || i.emisor.toLowerCase().includes(text);
+                return matchM && matchT;
             });
-            renderizarTablaRF(filteredRF);
+            renderizarTablaRF(fRF);
         }
 
-        // Iniciar carga al abrir la página
-        window.onload = () => {
-            cargarRentaVariable();
-            cargarRentaFija();
-        };
+        window.onload = cargarDatos;
     </script>
+</body>
+</html>
