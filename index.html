@@ -11,7 +11,6 @@
 <style>
   :root{
     --cap-teal:#60afc1; --cap-teal-10:rgba(96,175,193,0.10); --cap-teal-20:rgba(96,175,193,0.20);
-    --cap-teal-35:rgba(96,175,193,0.35); --cap-teal-60:rgba(96,175,193,0.60);
     --cap-violet:#696484; --cap-violet-10:rgba(105,100,132,0.10); --cap-violet-20:rgba(105,100,132,0.20);
     --cap-gold:#f5b800; --cap-gold-10:rgba(245,184,0,0.10); --cap-gold-20:rgba(245,184,0,0.20);
     --cap-gray:#9ba1a5; --cap-gray-10:rgba(155,161,165,0.10);
@@ -34,7 +33,8 @@
   <div class="h-[5px] bg-[#60afc1]"></div>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
     <div class="flex items-center gap-4">
-<img src="logo-CapacitaRSE.png" alt="CapacitaRSE" class="h-14 w-auto shrink-0">
+      <div class="w-14 h-14 rounded-lg border-2 border-dashed border-[#60afc1] flex items-center justify-center text-[9px] leading-tight text-center text-[#60afc1] shrink-0" title="Colocar aquí logo_CapacitaRSE.png">LOGO<br>CapacitaRSE</div>
+      <div>
         <h1 class="text-2xl sm:text-[28px] font-bold tracking-tight text-[#09193a]">Barómetro <span class="text-[#60afc1]">ASG Latam</span></h1>
         <p class="text-sm text-[#696484] mt-0.5">Renta variable y renta fija ASG en 7 mercados de la región · <a href="https://cursosderse.com" class="underline hover:text-[#60afc1]">CapacitaRSE</a></p>
       </div>
@@ -42,6 +42,7 @@
     <nav class="flex gap-1 bg-[#60afc1]/10 p-1 rounded-lg w-full lg:w-auto">
       <button onclick="switchTab('rv')" id="btn-rv" class="tab-active flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors">Renta Variable</button>
       <button onclick="switchTab('rf')" id="btn-rf" class="tab-inactive flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors hover:bg-white">Renta Fija</button>
+      <button onclick="switchTab('changelog')" id="btn-changelog" class="tab-inactive flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors hover:bg-white">Radar de Movimientos</button>
     </nav>
   </div>
 </header>
@@ -49,7 +50,7 @@
 <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
 
   <!-- KPIs -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
     <div class="bg-white rounded-lg border-l-[3px] border-[#60afc1] shadow-sm p-4">
       <div class="text-xs uppercase tracking-wide text-[#9ba1a5] font-medium">Acciones monitoreadas</div>
       <div id="kpi-acciones" class="text-3xl font-bold text-[#09193a] mt-1">—</div>
@@ -68,6 +69,10 @@
     </div>
   </div>
 
+  <p class="text-xs text-[#9ba1a5] mb-6 bg-[#f5b800]/10 border border-[#f5b800]/30 rounded-lg px-4 py-2.5">
+    <strong class="text-[#09193a]">Nota de cobertura:</strong> México (S&amp;P/BMV Total Mexico ESG) está pendiente de verificación en la fuente primaria de S&amp;P DJI — la composición mostrada es la última verificable públicamente. Colombia no cuenta con un índice ASG de desempeño local propio; se sigue únicamente su presencia en el S&amp;P Global Sustainability Yearbook. Jamaica (JSE) no tiene índice de sostenibilidad. 47 empresas de los sectores de minería, alimentos y logística llevan además una nota de concentración de cadena de suministro.
+  </p>
+
   <!-- Filtros -->
   <div class="flex flex-col sm:flex-row flex-wrap gap-3 mb-5">
     <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Buscar por ticker, empresa, emisor o bono..."
@@ -85,6 +90,16 @@
     <select id="sectorFilter" onchange="filterData()" class="bg-white border border-slate-300 text-[#09193a] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#60afc1]">
       <option value="ALL">Todos los sectores</option>
     </select>
+    <select id="estadoFilter" onchange="filterData()" class="bg-white border border-slate-300 text-[#09193a] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#60afc1]">
+      <option value="ALL">Todos los estados de validación</option>
+      <option value="Confirmado">Confirmado</option>
+      <option value="Pendiente">Pendiente de verificación</option>
+      <option value="Yearbook">Solo en Yearbook (fuera de índice)</option>
+    </select>
+    <select id="concentracionFilter" onchange="filterData()" class="bg-white border border-slate-300 text-[#09193a] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#60afc1]">
+      <option value="ALL">Todas (con o sin nota de cadena)</option>
+      <option value="SI">Solo con nota de concentración</option>
+    </select>
     <select id="tipoBonoFilter" onchange="filterData()" class="hidden bg-white border border-slate-300 text-[#09193a] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#60afc1]">
       <option value="ALL">Todos los tipos de bono</option>
     </select>
@@ -93,6 +108,13 @@
       <option value="Normal">🟢 Normal</option>
       <option value="Observación">🟡 Observación</option>
       <option value="Alerta">🔴 Alerta Default</option>
+    </select>
+    <select id="tipoEventoFilter" onchange="filterData()" class="hidden bg-white border border-slate-300 text-[#09193a] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:border-[#60afc1]">
+      <option value="ALL">Todos los tipos de movimiento</option>
+      <option value="entrada">Entradas</option>
+      <option value="salida">Salidas</option>
+      <option value="cambio">Cambios</option>
+      <option value="ampliacion">Ampliaciones de índice</option>
     </select>
   </div>
 
@@ -105,11 +127,11 @@
             <th class="p-3.5">Mercado</th>
             <th class="p-3.5">Ticker / Empresa</th>
             <th class="p-3.5">Sector GICS</th>
-            <th class="p-3.5 text-right">Precio</th>
-            <th class="p-3.5 text-center">Índice Local ASG</th>
+            <th class="p-3.5">Índice ASG Local</th>
             <th class="p-3.5 text-center">S&amp;P Yearbook</th>
-            <th class="p-3.5 text-center">Categoría S&amp;P</th>
             <th class="p-3.5">Reporte ASG</th>
+            <th class="p-3.5">Estado</th>
+            <th class="p-3.5">Concentración de Cadena</th>
           </tr>
         </thead>
         <tbody id="rv-table-body" class="divide-y divide-slate-100 text-sm"></tbody>
@@ -140,25 +162,50 @@
     <p id="rf-count" class="text-xs text-[#9ba1a5] mt-3"></p>
   </div>
 
+  <!-- Vista Radar de Movimientos -->
+  <div id="tab-changelog" class="hidden">
+    <p class="text-xs text-[#9ba1a5] mb-4 bg-[#696484]/10 border border-[#696484]/20 rounded-lg px-4 py-2.5">
+      <strong class="text-[#09193a]">Cómo leer esto:</strong> acá solo se registran movimientos reales verificados en fuentes oficiales (rebalanceos, entradas, salidas, cambios de tamaño de índice). Las correcciones internas del Barómetro (errores de carga, empresas mal clasificadas) no figuran acá — ese historial vive en las notas de versión del archivo, no en el radar de mercado.
+    </p>
+    <div id="changelog-list" class="flex flex-col gap-3"></div>
+    <p id="changelog-count" class="text-xs text-[#9ba1a5] mt-4"></p>
+  </div>
+
   <footer class="mt-10 pt-6 border-t border-slate-200 text-xs text-[#9ba1a5] leading-relaxed">
     <p>Barómetro ASG Latam · CapacitaRSE — <a href="https://cursosderse.com" class="underline hover:text-[#60afc1]">cursosderse.com</a></p>
-    <p class="mt-1">Información de referencia con fines educativos y de monitoreo. No constituye recomendación de inversión ni asesoramiento financiero. Los precios de mercado son referenciales y pueden no reflejar cotizaciones en tiempo real; verificar siempre en la fuente oficial de cada bolsa.</p>
+    <p class="mt-1">Información de referencia con fines educativos y de monitoreo. No constituye recomendación de inversión ni asesoramiento financiero. Verificar siempre en la fuente oficial de cada bolsa o emisor.</p>
   </footer>
 
 </main>
 
 <script>
   // ENLACES A CSV PUBLICADO (Google Sheets > Archivo > Compartir > Publicar en la web > CSV)
-  // Si se completan estas URLs, el sitio pasa a leer datos en vivo desde la planilla en lugar de la base embebida.
-  const URL_CSV_RENTA_VARIABLE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRniAeWLI97k7vcn5TzlBg0n89Ird3Rb-619RqXvHTEJ-aIniWGzsCIKrYWt0fX_Q/pub?gid=373182793&single=true&output=csv";
-  const URL_CSV_RENTA_FIJA = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRniAeWLI97k7vcn5TzlBg0n89Ird3Rb-619RqXvHTEJ-aIniWGzsCIKrYWt0fX_Q/pub?gid=2120126879&single=true&output=csv";
+  const URL_CSV_RENTA_VARIABLE = "";
+  const URL_CSV_RENTA_FIJA = "";
 
-  // Base de datos embebida — sincronizada desde Base_Barometro_ASG-3.xlsx (42 acciones / 22 bonos)
-  const baseRV = [["BYMA", "YPFD", "YPF S.A.", "Energía", "81575", "Sí", "Sí", "Industry Mover", "https://www.ypf.com/sustentabilidad", "Publicado", "2026-03"], ["BYMA", "ALUA", "Aluar Arg. de Aluminio", "Materiales", "975.5", "Sí", "No", "N/A", "https://www.aluar.com.ar/sustentabilidad", "Publicado", "2025-11"], ["BYMA", "GGAL", "Grupo Financiero Galicia", "Financiero", "7930", "Sí", "No", "N/A", "https://www.galicia.ar/sustentabilidad", "Publicado", "2026-01"], ["BYMA", "BMA", "Banco Macro", "Financiero", "14560", "Sí", "No", "N/A", "https://www.macro.com.ar/sustentabilidad", "Publicado", "2025-10"], ["BYMA", "PAMP", "Pampa Energía", "Servicios Públicos", "5510", "Sí", "No", "N/A", "https://www.pampaenergia.com/sustentabilidad", "Publicado", "2026-01"], ["B3", "B3SA3", "B3 S.A. - Brasil, Bolsa, Balcão", "Financiero", "15.55", "Sí", "Sí", "Top 5%", "https://ri.b3.com.br/sostenibilidad", "Publicado", "2026-02"], ["B3", "ITUB4", "Itaú Unibanco Holding", "Financiero", "42.11", "Sí", "Sí", "Top 10%", "https://www.itau.com.br/sustentabilidade", "Publicado", "2026-02"], ["B3", "BBDC4", "Banco Bradesco", "Financiero", "18.52", "Sí", "Sí", "Top 5%", "https://www.bradescosustentabilidade.com.br", "Publicado", "2026-02"], ["B3", "SUZB3", "Suzano S.A.", "Materiales", "41.79", "Sí", "Sí", "Top 5%", "https://www.suzano.com.br/sustentabilidade", "Publicado", "2026-02"], ["B3", "VALE3", "Vale S.A.", "Materiales", "75.25", "Sí", "Sí", "Member", "https://www.vale.com/es/esg", "Publicado", "2026-01"], ["B3", "WEGE3", "WEG S.A.", "Bienes de Capital", "45.55", "Sí", "Sí", "Member", "https://www.weg.net/sostenibilidad", "Publicado", "2026-02"], ["B3", "CPFE3", "CPFL Energia", "Servicios Públicos", "45.44", "Sí", "Sí", "Top 1%", "https://www.cpfl.com.br/sustentabilidade", "Publicado", "2026-02"], ["B3", "PETR4", "Petrobras", "Energía", "42.34", "Sí", "No", "N/A", "https://sustentabilidade.petrobras.com.br", "Publicado", "2026-01"], ["Santiago", "CMPC", "Empresas CMPC", "Materiales", "#N/A", "Sí", "Sí", "Top 1%", "https://www.cmpc.com/sostenibilidad", "Publicado", "2026-02"], ["Santiago", "AGUAS-A", "Aguas Andinas", "Servicios Públicos", "#N/A", "Sí", "Sí", "Top 5%", "https://www.aguasandinas.cl/sostenibilidad", "Publicado", "2026-02"], ["Santiago", "CAP", "CAP S.A.", "Materiales", "#N/A", "Sí", "Sí", "Top 10%", "https://www.cap.cl/sostenibilidad", "Publicado", "2026-02"], ["Santiago", "BSANTANDER", "Banco Santander Chile", "Financiero", "#N/A", "Sí", "Sí", "Top 10%", "https://www.santander.cl/sostenibilidad", "Publicado", "2026-02"], ["Santiago", "ENELCHILE", "Enel Chile", "Servicios Públicos", "#N/A", "Sí", "Sí", "Top 5%", "https://www.enel.cl/sostenibilidad", "Publicado", "2026-01"], ["Santiago", "CENCOSUD", "Cencosud", "Consumo Discrecional", "#N/A", "Sí", "Sí", "Industry Mover", "https://www.cencosud.com/sostenibilidad", "Publicado", "2026-02"], ["Santiago", "SQM-B", "SQM", "Materiales", "#N/A", "Sí", "Sí", "Member", "https://www.sqm.com/sostenibilidad", "Publicado", "2026-01"], ["bvc", "BCOLOMBIA", "Bancolombia", "Financiero", "#N/A", "Sí", "Sí", "Top 1%", "https://www.bancolombia.com/sostenibilidad", "Publicado", "2026-02"], ["bvc", "ISA", "Interconexión Eléctrica ISA", "Servicios Públicos", "#N/A", "Sí", "Sí", "Top 5%", "https://www.isa.co/sostenibilidad", "Publicado", "2026-02"], ["bvc", "NUTRESA", "Grupo Nutresa", "Consumo Básico", "#N/A", "Sí", "Sí", "Top 5%", "https://www.gruponutresa.com/sostenibilidad", "Publicado", "2026-02"], ["bvc", "GEB", "Grupo Energía Bogotá", "Servicios Públicos", "#N/A", "Sí", "Sí", "Member", "https://www.geb.com.co/sostenibilidad", "Publicado", "2026-01"], ["bvc", "ECOPETROL", "Ecopetrol", "Energía", "#N/A", "Sí", "Sí", "Member", "https://www.ecopetrol.com.co/sostenibilidad", "Publicado", "2026-02"], ["bvc", "GRUPOSURA", "Grupo Sura", "Financiero", "#N/A", "Sí", "Sí", "Member", "https://www.gruposura.com/sostenibilidad", "Publicado", "2026-01"], ["BMV", "GFNORTE", "Grupo Financiero Banorte", "Financiero", "191.06", "Sí", "Sí", "Top 5%", "https://investors.banorte.com/sostenibilidad", "Publicado", "2026-02"], ["BMV", "KOF", "Coca-Cola FEMSA", "Consumo Básico", "179.66", "Sí", "Sí", "Top 5%", "https://www.coca-colafemsa.com/sostenibilidad", "Publicado", "2026-02"], ["BMV", "CEMEX", "Cemex", "Materiales", "#N/A", "Sí", "Sí", "Top 10%", "https://www.cemex.com/sostenibilidad", "Publicado", "2026-02"], ["BMV", "WALMEX", "Walmart de México y CA", "Consumo Básico", "47.8", "Sí", "Sí", "Member", "https://www.walmex.mx/sostenibilidad", "Publicado", "2026-02"], ["BMV", "FEMSA", "Fomento Económico Mexicano", "Consumo Básico", "221.83", "Sí", "Sí", "Member", "https://www.femsa.com/sostenibilidad", "Publicado", "2026-01"], ["BMV", "AC", "Arca Continental", "Consumo Básico", "199.61", "Sí", "Sí", "Member", "https://www.arcacontal.com/sostenibilidad", "Publicado", "2026-02"], ["BMV", "AMX", "América Móvil", "Telecomunicaciones", "#N/A", "Sí", "No", "N/A", "https://www.americamovil.com/sostenibilidad", "Publicado", "2025-12"], ["BVL", "BAP", "Credicorp / BCP", "Financiero", "#N/A", "Sí", "Sí", "Member", "https://www.credicorp.com/sostenibilidad", "Publicado", "2026-02"], ["BVL", "IFS", "Intercorp Financial Services", "Financiero", "#N/A", "Sí", "Sí", "Member", "https://www.ifs.com.pe/sostenibilidad", "Publicado", "2026-02"], ["BVL", "FERREYC", "Ferreycorp", "Bienes de Capital", "#N/A", "Sí", "Sí", "Member", "https://www.ferreycorp.com.pe/sostenibilidad", "Publicado", "2026-01"], ["BVL", "CPACASC1", "Cementos Pacasmayo", "Materiales", "#N/A", "Sí", "Sí", "Industry Mover", "https://www.cementospacasmayo.com.pe", "Publicado", "2026-02"], ["BVL", "BVN", "Compañía de Minas Buenaventura", "Materiales", "#N/A", "Sí", "No", "N/A", "https://www.buenaventura.com/sostenibilidad", "Publicado", "2025-11"], ["JSE", "NCBFG", "NCB Financial Group", "Financiero", "JMD 32.50", "Sí", "No", "N/A", "https://www.myncb.com/sustainability", "Publicado", "2025-12"], ["JSE", "JMMBGL", "JMMB Group", "Financiero", "JMD 9.80", "Sí", "No", "N/A", "https://jmmb.com/esg", "Publicado", "2025-11"], ["JSE", "SJ", "Sagicor Group Jamaica", "Financiero", "JMD 45.00", "Sí", "No", "N/A", "https://www.sagicor.com/esg", "Publicado", "2025-12"], ["JSE", "SEP", "Seprod Limited", "Consumo Básico", "JMD 38.10", "Sí", "No", "N/A", "https://www.seprod.com/sustainability", "Publicado", "2025-10"]];
-  const baseRF = [["BYMA", "Plaza Logística", "BPO2O", "Verde", "🟢 Normal", "AA+(arg)", "Cumplimiento normal de repagos y métricas ambientales", "Emisión neta neutral en parques logísticos", "https://www.plazalogistica.com.ar", "2026-03"], ["BYMA", "YPF S.A.", "YCA6O", "Verde", "🟢 Normal", "A+(arg)", "Cupón al día, proyectos renovables operando al 100%", "Construcción de parques eólicos/solares", "https://www.ypf.com", "2026-03"], ["BYMA", "Genneia", "GN34O", "Verde", "🟢 Normal", "AA(arg)", "Excelente desempeño crediticio y generación limpia", "100% fondos destinados a energía eólica", "https://www.genneia.com.ar", "2026-03"], ["BYMA", "Telecom Argentina", "TLC10", "SLB", "🟢 Normal", "AA(arg)", "Cumplimiento de metas de eficiencia energética y renovables", "Incrementar uso de energía renovable al 50%", "https://institucional.personal.com.ar/sustentabilidad", "2026-03"], ["B3", "Suzano S.A.", "US86964W", "SLB", "🟢 Normal", "BBB-", "Monitoreo regular, cumplimiento adelantado de metas", "Reducción de intensidad de agua industrial 15%", "https://www.suzano.com.br", "2026-03"], ["B3", "Natura &Co", "US63884M", "SLB", "🟡 Observación", "BB+", "Revisión cercana de KPI de envases circulares", "45% de plástico reciclado post-consumo en envases", "https://www.naturaeco.com", "2026-03"], ["B3", "Light S.A.", "US532241", "Verde", "🔴 Alerta Default", "D", "En proceso de reestructuración / Recuperación Judicial", "Pérdidas no técnicas y proyectos de eficiencia", "https://www.light.com.br", "2026-03"], ["B3", "Rede D'Or", "US75734A", "Verde", "🟢 Normal", "BBB-", "Pagos al día y ampliación de hospitales certificados LEED", "Certificación ambiental en el 100% de nuevas sedes", "https://www.rededor.com.br", "2026-02"], ["Santiago", "Codelco", "US219876", "Sostenible", "🟡 Observación", "BBB+", "Revisión de perspectiva por ajuste en proyectos hídricos", "Reducción de 60% en consumo de agua fresca para 2030", "https://www.codelco.com", "2026-03"], ["Santiago", "Empresas CMPC", "CL000213", "Verde", "🟢 Normal", "BBB+", "Desempeño destacado en certificación FSC y reforestación", "100% celulosa certificada sostenible", "https://www.cmpc.com", "2026-03"], ["Santiago", "VTR Finance", "US918321", "SLB", "🔴 Alerta Default", "CC", "Riesgo de reestructuración de deuda / Periodo de gracia", "Capa de fibra óptica rural y eficiencia energética", "https://www.vtr.cl", "2026-03"], ["Santiago", "Banco Estado Chile", "CL000889", "Social", "🟢 Normal", "AAA (cl)", "Emisión social con alta demanda e impacto demostrado", "Financiamiento de vivienda social y microempresas", "https://www.bancoestado.cl", "2026-03"], ["bvc", "Bancolombia", "US05968L", "Sostenible", "🟢 Normal", "BB+", "Emisión sostenible destacada con alto repago", "Financiación de proyectos de energía solar y vivienda social", "https://www.bancolombia.com", "2026-03"], ["bvc", "Ecopetrol", "US279158", "Sostenible", "🟡 Observación", "BB+", "Seguimiento a metas de descarbonización por volatilidad de refinación", "Reducción de emisiones absolutas alcance 1 y 2 en 25%", "https://www.ecopetrol.com.co", "2026-03"], ["bvc", "Grupo Energía Bogotá", "CO000189", "Verde", "🟢 Normal", "AAA (col)", "Uso de fondos al 100% en líneas de transmisión renovable", "Conexión de parques eólicos en La Guajira", "https://www.geb.com.co", "2026-02"], ["BMV", "Cemex", "US151290", "SLB", "🟢 Normal", "BBB-", "Cumplimiento exitoso de KPI de emisión de CO2 por tonelada", "Cemento con bajo contenido de carbono (Vertua)", "https://www.cemex.com", "2026-03"], ["BMV", "CFE", "MX91CFE00", "Verde", "🟡 Observación", "BBB-", "Monitoreo de ejecución de proyectos hidroeléctricos", "Modernización de 16 plantas hidroeléctricas", "https://www.cfe.mx", "2026-03"], ["BMV", "TV Azteca / Elektra", "US88034P", "Sostenible", "🔴 Alerta Default", "D", "Conflicto legal con bonistas internacionales / Incumplimiento", "Inclusión digital en comunidades alejadas", "https://www.tvazteca.com", "2026-03"], ["BVL", "COFIDE", "US197022", "Sostenible", "🟢 Normal", "BBB-", "Fondo de desarrollo sostenible operando según prospecto", "Financiamiento a pymes lideradas por mujeres y proyectos verdes", "https://www.cofide.com.pe", "2026-03"], ["BVL", "Banco de Crédito del Perú", "US05971R", "Verde", "🟢 Normal", "BBB", "Colocación de cartera verde en transporte limpio e infraestructura", "Financiamiento de la Línea 2 del Metro de Lima", "https://www.viabcp.com", "2026-03"], ["BVL", "Hunt Oil Perú", "US445632", "SLB", "🟡 Observación", "BB+", "Seguimiento de meta de quema de gas (flaring)", "Cero quema rutinaria de gas en Camisea para 2027", "https://www.huntoil.com", "2026-02"], ["JSE", "TransJam Infrastructure", "JM000100", "Verde", "🟢 Normal", "A+(jm)", "Pagos regulares de peaje verde y conservación vial", "Reforestación y alumbrado solar en corredores viales", "https://www.transjamaican.com", "2026-03"]];
+  // Base de datos embebida — sincronizada desde Barometro_ASG_Latam_Master_2026_Corregido.xlsx
+  // RV: [mercado, pais, ticker, empresa, sector, precio(no evaluado), indiceLocalNombre, constituyente, spYearbook, categoriaSP, sitio, estadoValidacion]
+  const baseRV = [["BYMA", "Argentina", "YPFD", "YPF S.A.", "Energía", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "Sí", "Industry Mover", "https://www.ypf.com/sustentabilidad", "Confirmado", ""], ["BYMA", "Argentina", "GGAL", "Grupo Financiero Galicia S.A.", "Financiero", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "https://www.galicia.ar/sustentabilidad", "Confirmado", ""], ["BYMA", "Argentina", "BMA", "Banco Macro S.A.", "Financiero", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "https://www.macro.com.ar/sustentabilidad", "Confirmado", ""], ["BYMA", "Argentina", "TECO2", "Telecom Argentina S.A.", "Telecomunicaciones", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "https://institucional.telecom.com.ar", "Confirmado", ""], ["BYMA", "Argentina", "BBAR", "Banco BBVA Argentina S.A.", "Financiero", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "https://www.bbva.com.ar", "Confirmado", ""], ["BYMA", "Argentina", "TGSU2", "Transportadora De Gas Del Sur S.A.", "Servicios Públicos", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "https://www.tgs.com.ar", "Confirmado", ""], ["BYMA", "Argentina", "LOMA", "Loma Negra C.I.A.S.A.", "Materiales", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "https://www.lomanegra.com", "Confirmado", "Único productor a gran escala de cemento en el noreste argentino — alta concentración de mercado."], ["BYMA", "Argentina", "TXAR", "Ternium Argentina S.A.", "Materiales", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "https://br.ternium.com/es", "Confirmado", "Insumo siderúrgico estratégico para infraestructura y manufactura regional."], ["BYMA", "Argentina", "HARG", "Holcim Argentina S.A.", "Materiales", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "https://www.holcim.com.ar", "Confirmado", "Proveedor concentrado de cemento para infraestructura pública y privada."], ["BYMA", "Argentina", "BYMA", "Bolsas Y Mercados Argentinos S.A.", "Financiero", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "https://www.byma.com.ar", "Confirmado", ""], ["BYMA", "Argentina", "SAMI", "San Miguel A.G.I.C.I. y F", "Consumo Básico", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "https://www.sanmiguelglobal.com", "Confirmado", "Principal exportador argentino de cítricos — exposición a mercados de destino concentrados."], ["BYMA", "Argentina", "IRSA", "IRSA Inversiones Y Representaciones S.A.", "Bienes Raíces", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "https://www.irsa.com.ar", "Confirmado", ""], ["BYMA", "Argentina", "A3", "A3 Mercados S.A.", "Financiero", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "", "Confirmado", ""], ["BYMA", "Argentina", "BHIP", "Banco Hipotecario S.A.", "Financiero", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "", "Confirmado", ""], ["BYMA", "Argentina", "FERR", "Ferrum S.A.", "Materiales", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "", "Confirmado", ""], ["BYMA", "Argentina", "SUPV", "Grupo Supervielle S.A.", "Financiero", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "", "Confirmado", ""], ["BYMA", "Argentina", "PATA", "Importadora y Exportadora de la Patagonia S.A.", "Consumo Básico", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "", "Confirmado", ""], ["BYMA", "Argentina", "MOLA", "Molinos Agro S.A.", "Consumo Básico", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "", "Confirmado", "Procesador y exportador de soja y granos — relevante para seguridad alimentaria regional."], ["BYMA", "Argentina", "MOLI", "Molinos Río De La Plata S.A.", "Consumo Básico", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "", "Confirmado", "Uno de los mayores procesadores de alimentos de Argentina — aceites, harinas y pastas."], ["BYMA", "Argentina", "GBAN", "Naturgy Ban S.A.", "Servicios Públicos", null, "Índice Sustentabilidad BYMA (7º rebalanceo, jun-2026)", "Sí", "No", "N/A", "", "Confirmado", ""], ["Santiago", "Chile", "CHILE", "Banco de Chile", "Financials", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://bancochile.cl", "Confirmado", ""], ["Santiago", "Chile", "BCI", "Banco de Crédito e Inversiones (Bci)", "Financials", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://bci.cl", "Confirmado", ""], ["Santiago", "Chile", "ITAUCL", "Banco Itaú Chile", "Financials", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://itau.cl", "Confirmado", ""], ["Santiago", "Chile", "BSANTANDER", "Banco Santander Chile", "Financials", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://santander.cl", "Confirmado", ""], ["Santiago", "Chile", "ANTARCHILE", "AntarChile", "Industrials", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://antarchile.cl", "Confirmado", ""], ["Santiago", "Chile", "SK", "Sigdo Koppers", "Industrials", null, "DJ Best-in-Class Chile", "Sí", "No", "N/A", "https://sigdokoppers.cl", "Confirmado", ""], ["Santiago", "Chile", "COPEC", "Empresas Copec", "Energy", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://empresascopec.cl", "Confirmado", ""], ["Santiago", "Chile", "FALABELLA", "Falabella", "Consumer Discretionary", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://falabella.com", "Confirmado", ""], ["Santiago", "Chile", "SMU", "SMU", "Consumer Staples", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://smu.cl", "Confirmado", ""], ["Santiago", "Chile", "ILC", "Inversiones La Construcción (ILC)", "Financials", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://ilcinversiones.cl", "Confirmado", ""], ["Santiago", "Chile", "ANDINA-B", "Embotelladora Andina", "Consumer Staples", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://koandina.com", "Confirmado", ""], ["Santiago", "Chile", "MULTIFOODS", "Multiexport Foods", "Consumer Staples", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://multiexportfoods.com", "Confirmado", "Exportador de salmón — proteína de exportación relevante para Chile."], ["Santiago", "Chile", "CONCHATORO", "Viña Concha y Toro", "Consumer Staples", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://conchaytoro.com", "Confirmado", ""], ["Santiago", "Chile", "CAP", "CAP S.A.", "Materials", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Top 10%", "https://cap.cl", "Confirmado", "Único productor de mineral de hierro de Chile — insumo siderúrgico exportador."], ["Santiago", "Chile", "CMPC", "Empresas CMPC", "Materials", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Top 1%", "https://cmpc.com", "Confirmado", ""], ["Santiago", "Chile", "PARAUCO", "Parque Arauco", "Real Estate", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://parauco.com", "Confirmado", ""], ["Santiago", "Chile", "MALLPLAZA", "Mallplaza (Plaza)", "Real Estate", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://mallplaza.com", "Confirmado", ""], ["Santiago", "Chile", "SONDA", "Sonda", "Information Technology", null, "DJ Best-in-Class Chile", "Sí", "No", "N/A", "https://sonda.com", "Confirmado", ""], ["Santiago", "Chile", "ENTEL", "Entel Chile", "Communication Services", null, "DJ Best-in-Class Chile", "Sí", "Sí", "Member", "https://entel.cl", "Confirmado", ""], ["Santiago", "Chile", "LTM", "LATAM Airlines Group", "Industrials", null, "DJ Best-in-Class Chile", "Sí", "No", "N/A", "https://latamairlines.com", "Confirmado", "Principal aerolínea de conectividad regional en Sudamérica."], ["Santiago", "Chile", "SMSAAM", "SM SAAM", "Industrials", null, "DJ Best-in-Class Chile", "Sí", "No", "N/A", "https://saam.com", "Confirmado", "Operador portuario con presencia en múltiples países — nodo de exportación."], ["Santiago", "Chile", "COLBUN", "Colbún", "Utilities", null, "DJ Best-in-Class Chile", "Sí", "No", "N/A", "https://colbun.cl", "Confirmado", ""], ["Santiago", "Chile", "ENELAM", "Enel Américas", "Utilities", null, "DJ Best-in-Class Chile", "Sí", "No", "N/A", "https://enelamericas.com", "Confirmado", ""], ["Santiago", "Chile", "ENELCHILE", "Enel Chile", "Utilities", null, "DJ Best-in-Class Chile", "Sí", "No", "N/A", "https://enel.cl", "Confirmado", ""], ["Santiago", "Chile", "IAM", "Inversiones Aguas Metropolitanas (IAM)", "Utilities", null, "DJ Best-in-Class Chile", "Sí", "No", "N/A", "https://iam.cl", "Confirmado", ""], ["Santiago", "Chile", "AGUAS-A", "Aguas Andinas", "Utilities", null, "DJ Best-in-Class Chile", "No", "Sí", "Top 5%", "https://aguasandinas.cl", "S&P Yearbook 2026", ""], ["Santiago", "Chile", "SQM-B", "SQM", "Materials", null, "DJ Best-in-Class Chile", "No", "Sí", "Member", "https://sqm.com", "S&P Yearbook 2026", "Uno de los mayores productores mundiales de litio — insumo crítico para baterías y transición energética."], ["Santiago", "Chile", "CENCOSUD", "Cencosud", "Consumer Discretionary", null, "DJ Best-in-Class Chile", "No", "Sí", "Industry Mover", "https://cencosud.com", "S&P Yearbook 2026", ""], ["Santiago", "Chile", "EMBONOR-B", "Coca-Cola Embonor", "Consumer Staples", null, "DJ Best-in-Class Chile", "No", "Sí", "Member", "https://embonor.cl", "S&P Yearbook 2026", ""], ["Santiago", "Chile", "SALFACORP", "SalfaCorp", "Industrials", null, "DJ Best-in-Class Chile", "No", "Sí", "Member", "https://salfacorp.com", "S&P Yearbook 2026", ""], ["Santiago", "Chile", "VAPORES", "Compañía Sudamericana de Vapores", "Industrials", null, "DJ Best-in-Class Chile", "No", "Sí", "Member", "https://csav.com", "S&P Yearbook 2026", "Naviera con participación relevante en transporte marítimo de carga."], ["Santiago", "Chile", "CRISTALES", "Cristalerías de Chile", "Materials", null, "DJ Best-in-Class Chile", "No", "Sí", "Member", "https://cristalchile.cl", "S&P Yearbook 2026", ""], ["Santiago", "Chile", "ZOFRI", "ZONA FRANCA DE IQUIQUE (Zofri)", "Real Estate", null, "DJ Best-in-Class Chile", "No", "Sí", "Member", "https://zofri.cl", "S&P Yearbook 2026", ""], ["B3", "Brasil", "ALOS3", "Allos", "Real Estate", null, "ISE B3", "Sí", "No", "N/A", "https://ri.allos.co", "Confirmado", ""], ["B3", "Brasil", "AURE3", "Auren Energia", "Utilities", null, "ISE B3", "Sí", "No", "N/A", "https://aurenenergia.com.br", "Confirmado", ""], ["B3", "Brasil", "AXIA3", "Axia Energia S.A.", "Utilities", null, "ISE B3", "Sí", "Sí", "Member", "https://axia.com.br", "Confirmado (ISIN: BRAXIAACNOR0)", ""], ["B3", "Brasil", "AZZA3", "Azzas 2154", "Consumer Discretionary", null, "ISE B3", "Sí", "No", "N/A", "https://azzas2154.com.br", "Confirmado", ""], ["B3", "Brasil", "B3SA3", "B3 S.A. - Brasil, Bolsa, Balcão", "Financials", null, "ISE B3", "Sí", "Sí", "Member (Top 3%)", "https://b3.com.br", "Confirmado", ""], ["B3", "Brasil", "BBAS3", "Banco do Brasil", "Financials", null, "ISE B3", "Sí", "Sí", "Member", "https://bb.com.br", "Confirmado", ""], ["B3", "Brasil", "BBDC4", "Banco Bradesco", "Financials", null, "ISE B3", "Sí", "Sí", "Member", "https://banco.bradesco", "Confirmado", ""], ["B3", "Brasil", "SAUD3", "Bradsaúde S.A.", "Health Care", null, "ISE B3", "Sí", "No", "N/A", "https://www.bradesco.com.br", "Confirmado (ISIN: BRSAUDACNOR9)", ""], ["B3", "Brasil", "BRKM5", "Braskem", "Materials", null, "ISE B3", "Sí", "No", "N/A", "https://braskem.com.br", "Confirmado", ""], ["B3", "Brasil", "BPAC11", "BTG Pactual", "Financials", null, "ISE B3", "Sí", "No", "N/A", "https://btgpactual.com", "Confirmado", ""], ["B3", "Brasil", "CEAB3", "C&A Modas", "Consumer Discretionary", null, "ISE B3", "Sí", "No", "N/A", "https://cea.com.br", "Confirmado", ""], ["B3", "Brasil", "CMIG4", "Cemig", "Utilities", null, "ISE B3", "Sí", "Sí", "Member", "https://cemig.com.br", "Confirmado", ""], ["B3", "Brasil", "CBAV3", "Cia Brasileira de Alumínio (CBA)", "Materials", null, "ISE B3", "Sí", "Sí", "Member", "https://cba.com.br", "Confirmado", "Mayor productor de aluminio primario de Brasil — insumo industrial estratégico."], ["B3", "Brasil", "COGN3", "Cogna Educação", "Consumer Discretionary", null, "ISE B3", "Sí", "Sí", "Member", "https://cogna.com.br", "Confirmado", ""], ["B3", "Brasil", "CSMG3", "Copasa", "Utilities", null, "ISE B3", "Sí", "No", "N/A", "https://copasa.com.br", "Confirmado", ""], ["B3", "Brasil", "CPLE6", "Copel", "Utilities", null, "ISE B3", "Sí", "Sí", "Member", "https://copel.com", "Confirmado", ""], ["B3", "Brasil", "CSAN3", "Cosan", "Energy", null, "ISE B3", "Sí", "Sí", "Member", "https://cosan.com.br", "Confirmado", ""], ["B3", "Brasil", "CPFE3", "CPFL Energia", "Utilities", null, "ISE B3", "Sí", "No", "N/A", "https://cpfl.com.br", "Confirmado", ""], ["B3", "Brasil", "CYRE3", "Cyrela", "Real Estate", null, "ISE B3", "Sí", "No", "N/A", "https://cyrela.com.br", "Confirmado", ""], ["B3", "Brasil", "DXCO3", "Dexco", "Materials", null, "ISE B3", "Sí", "Sí", "Member", "https://dex.co", "Confirmado", ""], ["B3", "Brasil", "ECOR3", "Ecorodovias", "Industrials", null, "ISE B3", "Sí", "No", "N/A", "https://ecorodovias.com.br", "Confirmado", "Operador de concesiones viales — infraestructura de transporte terrestre crítica."], ["B3", "Brasil", "ENEV3", "Eneva", "Utilities", null, "ISE B3", "Sí", "No", "N/A", "https://eneva.com.br", "Confirmado", ""], ["B3", "Brasil", "EGIE3", "Engie Brasil", "Utilities", null, "ISE B3", "Sí", "Sí", "Top 5%", "https://engie.com.br", "Confirmado", ""], ["B3", "Brasil", "EQTL3", "Equatorial", "Utilities", null, "ISE B3", "Sí", "No", "N/A", "https://equatorialenergia.com.br", "Confirmado", ""], ["B3", "Brasil", "FLRY3", "Fleury", "Health Care", null, "ISE B3", "Sí", "Sí", "Member", "https://fleury.com.br", "Confirmado", ""], ["B3", "Brasil", "HBSA3", "Hidrovias do Brasil", "Industrials", null, "ISE B3", "Sí", "No", "N/A", "https://hidroviasdobrasil.com.br", "Confirmado", "Transporte fluvial de granos — corredor clave de exportación agrícola brasileña."], ["B3", "Brasil", "IGTI11", "Iguatemi", "Real Estate", null, "ISE B3", "Sí", "No", "N/A", "https://iguatemi.com.br", "Confirmado", ""], ["B3", "Brasil", "MYPK3", "Iochpe Maxion", "Consumer Discretionary", null, "ISE B3", "Sí", "No", "N/A", "https://iochpe.com.br", "Confirmado", ""], ["B3", "Brasil", "RANI3", "Irani Papel e Embalagem", "Materials", null, "ISE B3", "Sí", "No", "N/A", "https://irani.com.br", "Confirmado", ""], ["B3", "Brasil", "TRPL4", "ISA Energia (ISA CTEEP)", "Utilities", null, "ISE B3", "Sí", "No", "N/A", "https://isaenergiabrasil.com.br", "Confirmado", ""], ["B3", "Brasil", "ITUB4", "Itaú Unibanco", "Financials", null, "ISE B3", "Sí", "Sí", "Member", "https://itau.com.br", "Confirmado", ""], ["B3", "Brasil", "ITSA4", "Itaúsa", "Financials", null, "ISE B3", "Sí", "Sí", "Member", "https://itausa.com.br", "Confirmado", ""], ["B3", "Brasil", "JSLG3", "JSL", "Industrials", null, "ISE B3", "Sí", "No", "N/A", "https://jsl.com.br", "Confirmado", "Uno de los mayores operadores de transporte de carga de Brasil."], ["B3", "Brasil", "KLBN11", "Klabin", "Materials", null, "ISE B3", "Sí", "Sí", "Member", "https://klabin.com.br", "Confirmado", ""], ["B3", "Brasil", "LJQQ3", "Lojas Quero-Quero", "Consumer Discretionary", null, "ISE B3", "Sí", "No", "N/A", "https://queroquero.com.br", "Confirmado", ""], ["B3", "Brasil", "LREN3", "Lojas Renner", "Consumer Discretionary", null, "ISE B3", "Sí", "Sí", "Member", "https://lojasrenner.com.br", "Confirmado", ""], ["B3", "Brasil", "MDIA3", "M. Dias Branco", "Consumer Staples", null, "ISE B3", "Sí", "No", "N/A", "https://mdiasbranco.com.br", "Confirmado", "Mayor procesador de trigo y pastas de Brasil — insumo alimentario de consumo masivo."], ["B3", "Brasil", "MGLU3", "Magazine Luiza", "Consumer Discretionary", null, "ISE B3", "Sí", "No", "N/A", "https://ri.magazineluiza.com.br", "Confirmado", ""], ["B3", "Brasil", "MRFG3", "Marfrig", "Consumer Staples", null, "ISE B3", "Sí", "No", "N/A", "https://marfrig.com.br", "Confirmado", "Uno de los mayores exportadores mundiales de carne bovina."], ["B3", "Brasil", "MILS3", "Mills", "Industrials", null, "ISE B3", "Sí", "No", "N/A", "https://mills.com.br", "Confirmado", ""], ["B3", "Brasil", "BEEF3", "Minerva", "Consumer Staples", null, "ISE B3", "Sí", "No", "N/A", "https://minervafoods.com", "Confirmado", "Mayor exportador de carne bovina de Sudamérica."], ["B3", "Brasil", "MTRE3", "Mitre Realty", "Real Estate", null, "ISE B3", "Sí", "No", "N/A", "https://mitrerealty.com.br", "Confirmado", ""], ["B3", "Brasil", "MOTV3", "Motiva (ex-CCR)", "Industrials", null, "ISE B3", "Sí", "Sí", "Member", "https://motiva.com.br", "Confirmado", "Concesionaria de rutas y aeropuertos — infraestructura de transporte crítica."], ["B3", "Brasil", "MOVI3", "Movida", "Industrials", null, "ISE B3", "Sí", "No", "N/A", "https://movida.com.br", "Confirmado", ""], ["B3", "Brasil", "MRVE3", "MRV", "Consumer Discretionary", null, "ISE B3", "Sí", "No", "N/A", "https://mrv.com.br", "Confirmado", ""], ["B3", "Brasil", "NTCO3", "Natura &Co", "Consumer Staples", null, "ISE B3", "Sí", "Sí", "Member", "https://natura.com.br", "Confirmado", ""], ["B3", "Brasil", "OPCT3", "OceanPact", "Energy", null, "ISE B3", "Sí", "No", "N/A", "https://oceanpact.com", "Confirmado", ""], ["B3", "Brasil", "PGMN3", "Pague Menos", "Consumer Staples", null, "ISE B3", "Sí", "No", "N/A", "https://paguemenos.com.br", "Confirmado", ""], ["B3", "Brasil", "PTBL3", "Portobello", "Industrials", null, "ISE B3", "Sí", "No", "N/A", "https://portobello.com.br", "Confirmado", ""], ["B3", "Brasil", "PSSA3", "Porto Seguro", "Financials", null, "ISE B3", "Sí", "No", "N/A", "https://portoseguro.com.br", "Confirmado", ""], ["B3", "Brasil", "RADL3", "Raia Drogasil", "Consumer Staples", null, "ISE B3", "Sí", "No", "N/A", "https://rd.com.br", "Confirmado", ""], ["B3", "Brasil", "GUAR3", "Riachuelo (Guararapes)", "Consumer Discretionary", null, "ISE B3", "Sí", "No", "N/A", "https://riachuelo.com.br", "Confirmado", ""], ["B3", "Brasil", "RAIL3", "Rumo", "Industrials", null, "ISE B3", "Sí", "Sí", "Member", "https://rumolog.com", "Confirmado", "Mayor operador ferroviario de carga de Brasil — corredor clave hacia el puerto de Santos."], ["B3", "Brasil", "SBSP3", "Sabesp", "Utilities", null, "ISE B3", "Sí", "No", "N/A", "https://sabesp.com.br", "Confirmado", ""], ["B3", "Brasil", "SAPR11", "Sanepar", "Utilities", null, "ISE B3", "Sí", "No", "N/A", "https://sanepar.com.br", "Confirmado", ""], ["B3", "Brasil", "SANB11", "Santander Brasil", "Financials", null, "ISE B3", "Sí", "No", "N/A", "https://santander.com.br", "Confirmado", ""], ["B3", "Brasil", "ASAI3", "Sendas (Assaí)", "Consumer Staples", null, "ISE B3", "Sí", "No", "N/A", "https://assai.com.br", "Confirmado", ""], ["B3", "Brasil", "SIMH3", "Simpar", "Industrials", null, "ISE B3", "Sí", "No", "N/A", "https://simpar.com.br", "Confirmado", "Holding de logística con operaciones de transporte, renting y distribución."], ["B3", "Brasil", "SLCE3", "SLC Agrícola", "Consumer Staples", null, "ISE B3", "Sí", "No", "N/A", "https://slcagricola.com.br", "Confirmado", "Una de las mayores productoras de soja, algodón y maíz de Brasil."], ["B3", "Brasil", "TGMA3", "Tegma", "Industrials", null, "ISE B3", "Sí", "No", "N/A", "https://tegma.com.br", "Confirmado", "Operador de logística automotriz — eslabón crítico de la cadena industrial."], ["B3", "Brasil", "VIVT3", "Telefônica Brasil (Vivo)", "Communication Services", null, "ISE B3", "Sí", "Sí", "Member", "https://telefonica.com.br", "Confirmado", ""], ["B3", "Brasil", "TIMS3", "TIM Brasil", "Communication Services", null, "ISE B3", "Sí", "Sí", "Member", "https://tim.com.br", "Confirmado", ""], ["B3", "Brasil", "TTEN3", "Três Tentos", "Consumer Staples", null, "ISE B3", "Sí", "No", "N/A", "https://grupo3tentos.com.br", "Confirmado", "Trading y procesamiento de granos — relevante para exportación agrícola brasileña."], ["B3", "Brasil", "UGPA3", "Ultrapar", "Energy", null, "ISE B3", "Sí", "No", "N/A", "https://ultra.com.br", "Confirmado", ""], ["B3", "Brasil", "USIM5", "Usiminas", "Materials", null, "ISE B3", "Sí", "No", "N/A", "https://usiminas.com", "Confirmado", "Productor siderúrgico de escala regional — insumo para infraestructura y manufactura."], ["B3", "Brasil", "VAMO3", "Vamos", "Industrials", null, "ISE B3", "Sí", "No", "N/A", "https://grupovamos.com.br", "Confirmado", "Alquiler de flotas de camiones — relevante para transporte de carga."], ["B3", "Brasil", "VBBR3", "Vibra Energia", "Energy", null, "ISE B3", "Sí", "No", "N/A", "https://vibraenergia.com.br", "Confirmado", ""], ["B3", "Brasil", "WEGE3", "WEG S.A.", "Industrials", null, "ISE B3", "Sí", "Sí", "Member", "https://weg.net", "Confirmado", ""], ["B3", "Brasil", "YDUQ3", "Yduqs", "Consumer Discretionary", null, "ISE B3", "Sí", "Sí", "Member", "https://yduqs.com.br", "Confirmado", ""], ["B3", "Brasil", "SUZB3", "Suzano S.A.", "Materials", null, "ISE B3", "No", "Sí", "Top 5%", "https://suzano.com.br", "Fuera de ISE B3 (En Yearbook)", ""], ["B3", "Brasil", "VALE3", "Vale S.A.", "Materials", null, "ISE B3", "No", "Sí", "Member", "https://vale.com", "Fuera de ISE B3 (En Yearbook)", "Uno de los mayores productores mundiales de mineral de hierro y níquel — nodo crítico de cadenas globales de suministro."], ["B3", "Brasil", "PETR4", "Petrobras", "Energy", null, "ISE B3", "No", "Sí", "Member", "https://petrobras.com.br", "Fuera de ISE B3 (En Yearbook)", ""], ["bvc", "Colombia", "BCOLOMBIA", "Bancolombia", "Financials", null, "Sin índice ASG de desempeño propio — bvc solo tiene Colir (índice de prácticas de RI, no de desempeño ASG)", "No", "Sí", "Top 1%", "https://www.bancolombia.com/sostenibilidad", "Confirmado", ""], ["bvc", "Colombia", "ISA", "Interconexión Eléctrica ISA", "Utilities", null, "Sin índice ASG de desempeño propio — bvc solo tiene Colir (índice de prácticas de RI, no de desempeño ASG)", "No", "Sí", "Top 5%", "https://www.isa.co/sostenibilidad", "Confirmado", ""], ["bvc", "Colombia", "NUTRESA", "Grupo Nutresa", "Consumer Staples", null, "Sin índice ASG de desempeño propio — bvc solo tiene Colir (índice de prácticas de RI, no de desempeño ASG)", "No", "Sí", "Top 5%", "https://www.gruponutresa.com", "Confirmado", "Mayor conglomerado alimentario de Colombia — cacao, café, carnes y pastas."], ["bvc", "Colombia", "GEB", "Grupo Energía Bogotá", "Utilities", null, "Sin índice ASG de desempeño propio — bvc solo tiene Colir (índice de prácticas de RI, no de desempeño ASG)", "No", "Sí", "Member", "https://www.geb.com.co", "Confirmado", ""], ["bvc", "Colombia", "ECOPETROL", "Ecopetrol", "Energy", null, "Sin índice ASG de desempeño propio — bvc solo tiene Colir (índice de prácticas de RI, no de desempeño ASG)", "No", "Sí", "Member", "https://www.ecopetrol.com.co", "Confirmado", ""], ["bvc", "Colombia", "GRUPOSURA", "Grupo Sura", "Financials", null, "Sin índice ASG de desempeño propio — bvc solo tiene Colir (índice de prácticas de RI, no de desempeño ASG)", "No", "Sí", "Member", "https://www.gruposura.com", "Confirmado", ""], ["bvc", "Colombia", "GRUPOARGOS", "Grupo Argos", "Materials", null, "Sin índice ASG de desempeño propio — bvc solo tiene Colir (índice de prácticas de RI, no de desempeño ASG)", "No", "Sí", "Member", "https://www.grupoargos.com", "Confirmado", "Conglomerado cementero con posición dominante en Colombia y expansión regional."], ["bvc", "Colombia", "CORFICOLCF", "Corficolombiana", "Financials", null, "Sin índice ASG de desempeño propio — bvc solo tiene Colir (índice de prácticas de RI, no de desempeño ASG)", "No", "No", "N/A", "https://www.corficolombiana.com", "Confirmado", ""], ["BMV", "México", "AC", "Arca Continental", "Consumer Staples", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://arcacontal.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "AGUA", "Grupo Rotoplas", "Industrials", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://rotoplas.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "ALPEKA", "Alpek", "Materials", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://alpek.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "ALSEA", "Alsea", "Consumer Discretionary", null, "S&P/BMV Total Mexico ESG", "Sí", "No", "N/A", "https://alsea.net", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "AMXB", "América Móvil", "Communication Services", null, "S&P/BMV Total Mexico ESG", "Sí", "No", "N/A", "https://americamovil.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "BIMBOA", "Grupo Bimbo", "Consumer Staples", null, "S&P/BMV Total Mexico ESG", "Sí", "No", "N/A", "https://grupobimbo.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", "Mayor panificadora del mundo — insumo alimentario básico a escala regional."], ["BMV", "México", "BOLSAA", "Bolsa Mexicana de Valores", "Financials", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://bmv.com.mx", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "CEMEXCPO", "Cemex", "Materials", null, "S&P/BMV Total Mexico ESG", "Sí", "No", "N/A", "https://cemex.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", "Productor cementero global con alta concentración de mercado en varias plazas."], ["BMV", "México", "ELEKTRA", "Grupo Elektra", "Consumer Discretionary", null, "S&P/BMV Total Mexico ESG", "Sí", "No", "N/A", "https://grupoelektra.com.mx", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "FEMSAUBD", "FEMSA", "Consumer Staples", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://femsa.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "FIBRAPL14", "Fibra Prologis", "Real Estate", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://fibraprologis.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "FUNO11", "Fibra Uno", "Real Estate", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://funo.mx", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "GAPB", "Grupo Aeroportuario del Pacífico", "Industrials", null, "S&P/BMV Total Mexico ESG", "Sí", "No", "N/A", "https://aeropuertosgap.com.mx", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", "Operador de 12 aeropuertos en México y Jamaica — infraestructura de conectividad crítica."], ["BMV", "México", "GFNORTEO", "Grupo Financiero Banorte", "Financials", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://banorte.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "GMEXICOB", "Grupo México", "Materials", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://gmexico.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", "Uno de los mayores productores mundiales de cobre — insumo crítico para electrificación y transición energética."], ["BMV", "México", "GMXT", "GMéxico Transportes", "Industrials", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://gmxt.mx", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", "Principal operador ferroviario de carga de México — corredor clave de comercio con EE.UU."], ["BMV", "México", "KIMBERA", "Kimberly-Clark de México", "Consumer Staples", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://kimberly-clark.com.mx", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "KOFUBL", "Coca-Cola FEMSA", "Consumer Staples", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://coca-colafemsa.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "LABB", "Genomma Lab", "Health Care", null, "S&P/BMV Total Mexico ESG", "Sí", "No", "N/A", "https://genommalab.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "LIVEPOLC-1", "El Puerto de Liverpool", "Consumer Discretionary", null, "S&P/BMV Total Mexico ESG", "Sí", "No", "N/A", "https://elpuertodeliverpool.mx", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "ORBIA", "Orbia Advance Corporation", "Materials", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://orbia.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "Q", "Quálitas Controladora", "Financials", null, "S&P/BMV Total Mexico ESG", "Sí", "No", "N/A", "https://qualitas.com.mx", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "TLEVISACPO", "Grupo Televisa", "Communication Services", null, "S&P/BMV Total Mexico ESG", "Sí", "No", "N/A", "https://televisair.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "TRAXIONA", "Grupo Traxión", "Industrials", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Top 5%", "https://traxion.global", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", "Uno de los mayores operadores de transporte de carga de México."], ["BMV", "México", "VESTA", "Corporación Inmobiliaria Vesta", "Real Estate", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://vesta.com.mx", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "WALMEX", "Walmart de México y CA", "Consumer Staples", null, "S&P/BMV Total Mexico ESG", "Sí", "No", "N/A", "https://walmex.mx", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "FMTY14", "Fibra Mty", "Real Estate", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://fibramty.com", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BMV", "México", "DANHOS13", "Fibra Danhos", "Real Estate", null, "S&P/BMV Total Mexico ESG", "Sí", "Sí", "Member", "https://danhos.com.mx", "Pendiente verificación en fuente primaria (S&P DJI, requiere registro)", ""], ["BVL", "Perú", "AENZAC1", "AENZA", "Industrials", null, "S&P/BVL Peru General ESG", "Sí", "No", "N/A", "https://aenza.com.pe", "Confirmado", "Conglomerado de infraestructura y construcción con proyectos de gran escala en Perú."], ["BVL", "Perú", "ALICORC1", "Alicorp", "Consumer Staples", null, "S&P/BVL Peru General ESG", "Sí", "Sí", "Member", "https://alicorp.com.pe", "Confirmado", "Mayor conglomerado de alimentos de Perú — aceites, pastas y harinas."], ["BVL", "Perú", "BBVAC1", "Banco BBVA Perú", "Financials", null, "S&P/BVL Peru General ESG", "Sí", "No", "N/A", "https://bbva.pe", "Confirmado", ""], ["BVL", "Perú", "CPACASC1", "Cementos Pacasmayo", "Materials", null, "S&P/BVL Peru General ESG", "Sí", "Sí", "Top 10%", "https://cementospacasmayo.com.pe", "Confirmado", "Posición dominante en cemento en el norte de Perú."], ["BVL", "Perú", "BVN", "Compañía de Minas Buenaventura", "Materials", null, "S&P/BVL Peru General ESG", "Sí", "No", "N/A", "https://buenaventura.com", "Confirmado", "Mayor productora de oro y plata de Perú — exposición a volatilidad de commodities y riesgo social."], ["BVL", "Perú", "CORAREI1", "Corporación Aceros Arequipa", "Materials", null, "S&P/BVL Peru General ESG", "Sí", "Sí", "Member", "https://acerosarequipa.com", "Confirmado", "Principal productor siderúrgico de Perú — insumo para construcción e infraestructura."], ["BVL", "Perú", "BAP", "Credicorp / BCP", "Financials", null, "S&P/BVL Peru General ESG", "Sí", "No", "N/A", "https://credicorp.com", "Confirmado", ""], ["BVL", "Perú", "ENGEPEC1", "Enel Generación Perú", "Utilities", null, "S&P/BVL Peru General ESG", "Sí", "No", "N/A", "https://enel.pe", "Confirmado", ""], ["BVL", "Perú", "FERREYC1", "Ferreycorp", "Industrials", null, "S&P/BVL Peru General ESG", "Sí", "Sí", "Top 5%", "https://ferreycorp.com.pe", "Confirmado", "Distribuidor de maquinaria pesada — eslabón crítico de la cadena de suministro minera."], ["BVL", "Perú", "INRETC1", "InRetail Perú", "Consumer Staples", null, "S&P/BVL Peru General ESG", "Sí", "No", "N/A", "https://inretail.pe", "Confirmado", ""], ["BVL", "Perú", "IFS", "Intercorp Financial Services", "Financials", null, "S&P/BVL Peru General ESG", "Sí", "Sí", "Member", "https://intercorp.com.pe", "Confirmado", ""], ["BVL", "Perú", "MINSURI1", "Minsur", "Materials", null, "S&P/BVL Peru General ESG", "Sí", "Sí", "Member", "https://minsur.com", "Confirmado", "Uno de los mayores productores mundiales de estaño — mineral crítico para electrónica."], ["BVL", "Perú", "NEXAPEC1", "Nexa Resources Perú", "Materials", null, "S&P/BVL Peru General ESG", "Sí", "No", "N/A", "https://nexaresources.com", "Confirmado", "Productora de zinc — mineral crítico para galvanizado y baterías."], ["BVL", "Perú", "RIMSEGC1", "Rímac Seguros", "Financials", null, "S&P/BVL Peru General ESG", "Sí", "Sí", "Member", "https://rimac.com", "Confirmado", ""], ["BVL", "Perú", "SCCO", "Southern Copper", "Materials", null, "S&P/BVL Peru General ESG", "Sí", "No", "N/A", "https://southerncoppercorp.com", "Confirmado", "Uno de los mayores productores mundiales de cobre — insumo crítico para electrificación."], ["BVL", "Perú", "UNACEMC1", "UNACEM", "Materials", null, "S&P/BVL Peru General ESG", "Sí", "Sí", "Top 10%", "https://unacem.pe", "Confirmado", "Posición dominante en cemento en Perú — insumo concentrado para infraestructura."], ["BVL", "Perú", "CALIDDA", "Cálidda (Gas Natural Lima)", "Utilities", "N/A", "S&P/BVL Peru General ESG", "No", "Sí", "Member", "https://calidda.com.pe", "Fuera de BVL ESG (En Yearbook)", ""], ["JSE", "Jamaica", "NCBFG", "NCB Financial Group", "Financials", "JMD 65.00", "No existe — JSE no tiene índice de sostenibilidad (solo índices generales de mercado)", "No", "No", "N/A", "https://myncb.com", "Confirmado", ""], ["JSE", "Jamaica", "JMMBGL", "JMMB Group", "Financials", "JMD 9.80", "No existe — JSE no tiene índice de sostenibilidad (solo índices generales de mercado)", "No", "No", "N/A", "https://jmmb.com", "Confirmado", ""], ["JSE", "Jamaica", "SJ", "Sagicor Group Jamaica", "Financials", "JMD 45.00", "No existe — JSE no tiene índice de sostenibilidad (solo índices generales de mercado)", "No", "No", "N/A", "https://sagicor.com", "Confirmado", ""], ["JSE", "Jamaica", "SEP", "Seprod Limited", "Consumer Staples", "JMD 38.10", "No existe — JSE no tiene índice de sostenibilidad (solo índices generales de mercado)", "No", "No", "N/A", "https://seprod.com", "Confirmado", "Principal fabricante de alimentos de Jamaica — alta concentración en mercado insular pequeño."]];
+  // RF: [mercado, pais, emisor, bono, tipo, estado, rating, alerta, kpi, enlaceDoc, fechaRevision]
+  const baseRF = [["BYMA", "Argentina", "Plaza Logística", "BPO2O", "Verde", "🟢 Normal", "AA+(arg)", "Cumplimiento normal de repagos y métricas ambientales", "Emisión neta neutral en parques logísticos", "https://www.plazalogistica.com.ar", "2026-03"], ["BYMA", "Argentina", "YPF S.A.", "YCA6O", "Verde", "🟢 Normal", "A+(arg)", "Cupón al día, proyectos renovables operando al 100%", "Construcción de parques eólicos/solares", "https://www.ypf.com", "2026-03"], ["BYMA", "Argentina", "Genneia", "GN34O", "Verde", "🟢 Normal", "AA(arg)", "Excelente desempeño crediticio y generación limpia", "100% fondos destinados a energía eólica", "https://www.genneia.com.ar", "2026-03"], ["BYMA", "Argentina", "Telecom Argentina", "TLC1O", "SLB", "🟢 Normal", "AA+(arg)", "Cumplimiento de metas de eficiencia energética y renovables", "Incrementar uso de energía renovable al 50%", "https://institucional.telecom.com.ar", "2026-03"], ["B3", "Brasil", "Suzano S.A.", "US86964W", "SLB", "🟢 Normal", "BBB-", "Monitoreo regular, cumplimiento adelantado de metas", "Reducción de intensidad de agua industrial 15%", "https://www.suzano.com.br", "2026-03"], ["B3", "Brasil", "Natura &Co", "US63884M", "SLB", "🟡 Observación", "BB+", "Revisión cercana de KPI de envases circulares", "45% de plástico reciclado post-consumo en envases", "https://www.naturaeco.com", "2026-03"], ["B3", "Brasil", "Light S.A.", "US532241", "Verde", "🔴 Alerta Default", "D", "En proceso de reestructuración / Recuperación Judicial", "Pérdidas no técnicas y proyectos de eficiencia", "https://www.light.com.br", "2026-03"], ["B3", "Brasil", "Rede D'Or", "US75734A", "Verde", "🟢 Normal", "BBB-", "Pagos al día y ampliación de hospitales certificados LEED", "Certificación ambiental en el 100% de nuevas sedes", "https://www.rededor.com.br", "2026-02"], ["Santiago", "Chile", "Codelco", "US219876", "Sostenible", "🟡 Observación", "BBB+", "Revisión de perspectiva por ajuste en proyectos hídricos", "Reducción de 60% en consumo de agua fresca para 2030", "https://www.codelco.com", "2026-03"], ["Santiago", "Chile", "Empresas CMPC", "CL000213", "Verde", "🟢 Normal", "BBB+", "Desempeño destacado en certificación FSC y reforestación", "100% celulosa certificada sostenible", "https://www.cmpc.com", "2026-03"], ["Santiago", "Chile", "VTR Finance", "US918321", "SLB", "🔴 Alerta Default", "CC", "Riesgo de reestructuración de deuda / Periodo de gracia", "Capa de fibra óptica rural y eficiencia energética", "https://www.vtr.cl", "2026-03"], ["Santiago", "Chile", "Banco Estado Chile", "CL000889", "Social", "🟢 Normal", "AAA (cl)", "Emisión social con alta demanda e impacto demostrado", "Financiamiento de vivienda social y microempresas", "https://www.bancoestado.cl", "2026-03"], ["bvc", "Colombia", "Bancolombia", "US05968L", "Sostenible", "🟢 Normal", "BB+", "Emisión sostenible destacada con alto repago", "Financiación de proyectos de energía solar y vivienda social", "https://www.bancolombia.com", "2026-03"], ["bvc", "Colombia", "Ecopetrol", "US279158", "Sostenible", "🟡 Observación", "BB+", "Seguimiento a metas de descarbonización por volatilidad", "Reducción de emisiones absolutas alcance 1 y 2 en 25%", "https://www.ecopetrol.com.co", "2026-03"], ["bvc", "Colombia", "Grupo Energía Bogotá", "CO000189", "Verde", "🟢 Normal", "AAA (col)", "Uso de fondos al 100% en líneas de transmisión renovable", "Conexión de parques eólicos en La Guajira", "https://www.geb.com.co", "2026-02"], ["BMV", "México", "Cemex", "US151290", "SLB", "🟢 Normal", "BBB-", "Cumplimiento exitoso de KPI de emisión de CO2 por tonelada", "Cemento con bajo contenido de carbono (Vertua)", "https://www.cemex.com", "2026-03"], ["BMV", "México", "CFE", "MX91CFE00", "Verde", "🟡 Observación", "BBB-", "Monitoreo de ejecución de proyectos hidroeléctricos", "Modernización de 16 plantas hidroeléctricas", "https://www.cfe.mx", "2026-03"], ["BMV", "México", "TV Azteca / Elektra", "US88034P", "Sostenible", "🔴 Alerta Default", "D", "Conflicto legal con bonistas internacionales / Incumplimiento", "Inclusión digital en comunidades alejadas", "https://www.tvazteca.com", "2026-03"], ["BVL", "Perú", "COFIDE", "US197022", "Sostenible", "🟢 Normal", "BBB-", "Fondo de desarrollo sostenible operando según prospecto", "Financiamiento a pymes lideradas por mujeres y proyectos verdes", "https://www.cofide.com.pe", "2026-03"], ["BVL", "Perú", "Banco de Crédito del Perú", "US05971R", "Verde", "🟢 Normal", "BBB", "Colocación de cartera verde en transporte limpio e infraestructura", "Financiamiento de la Línea 2 del Metro de Lima", "https://www.viabcp.com", "2026-03"], ["BVL", "Perú", "Hunt Oil Perú", "US445632", "SLB", "🟡 Observación", "BB+", "Seguimiento de meta de quema de gas (flaring)", "Cero quema rutinaria de gas en Camisea para 2027", "https://www.huntoil.com", "2026-02"], ["JSE", "Jamaica", "TransJam Infrastructure", "JM000100", "Verde", "🟢 Normal", "A+(jm)", "Pagos regulares de peaje verde y conservación vial", "Reforestación y alumbrado solar en corredores viales", "https://www.transjamaican.com", "2026-03"]];
 
-  const MONEDA_POR_MERCADO = { BYMA:"ARS", B3:"BRL", Santiago:"CLP", bvc:"COP", BMV:"MXN", BVL:"PEN", JSE:"JMD" };
-  const LOCALE_POR_MERCADO = { BYMA:"es-AR", B3:"pt-BR", Santiago:"es-CL", bvc:"es-CO", BMV:"es-MX", BVL:"es-PE", JSE:"en-JM" };
+  const GF_PREFIX = { BYMA:"BCBA", B3:"BVMF", Santiago:"SANTIAGO", bvc:"BVC", BMV:"BMV", BVL:"BVL", JSE:"JSE" };
+
+  // Radar de movimientos — solo eventos reales verificados en fuente oficial, no correcciones internas del Barómetro
+  const changelog = [
+    { fecha:"2026-06-16", mercado:"BYMA", tipo:"cambio",
+      titulo:"Ferrum S.A. reemplaza a Pampa Energía en el Índice de Sustentabilidad BYMA",
+      detalle:"El 7° rebalanceo del índice incorporó a Ferrum S.A. (FERR) y excluyó a Pampa Energía (PAMP). Las otras 19 posiciones no tuvieron cambios respecto al rebalanceo anterior.",
+      fuente:"https://sustenomics.com/byma-presento-el-septimo-rebalanceo-de-su-indice-de-sustentabilidad/" },
+    { fecha:"2026-05-31", mercado:"Santiago", tipo:"ampliacion",
+      titulo:"El Dow Jones Best-in-Class Chile crece de 23 a 25 empresas",
+      detalle:"La edición 2026 del índice (ex DJSI Chile, renombrado en 2024 por lineamientos ESMA) sumó 2 posiciones netas respecto a la edición 2025. La fuente consultada no detalló los nombres específicos de altas/bajas.",
+      fuente:"" },
+    { fecha:"2024-05-21", mercado:"BVL", tipo:"entrada",
+      titulo:"Enel Generación Perú y Rímac Seguros ingresan al índice ESG de la BVL",
+      detalle:"Ambas se sumaron al S&P/BVL Peru General ESG Index en el rebalanceo 2024-2025, completando el índice en 16 constituyentes.",
+      fuente:"https://forbes.pe/economia-y-finanzas/2024-05-21/conoce-las-16-empresas-peruanas-que-integran-el-indice-de-sostenibilidad-del-sp-y-la-bvl" },
+  ];
 
   let datosRV = [];
   let datosRF = [];
@@ -166,69 +213,66 @@
   function switchTab(tab) {
     document.getElementById('tab-rv').classList.toggle('hidden', tab !== 'rv');
     document.getElementById('tab-rf').classList.toggle('hidden', tab !== 'rf');
-    document.getElementById('btn-rv').className = (tab === 'rv' ? 'tab-active' : 'tab-inactive') + ' flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors hover:bg-white';
-    document.getElementById('btn-rf').className = (tab === 'rf' ? 'tab-active' : 'tab-inactive') + ' flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors hover:bg-white';
+    document.getElementById('tab-changelog').classList.toggle('hidden', tab !== 'changelog');
+    ['rv','rf','changelog'].forEach(t => {
+      document.getElementById('btn-' + t).className = (tab === t ? 'tab-active' : 'tab-inactive') + ' flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors hover:bg-white';
+    });
     document.getElementById('sectorFilter').classList.toggle('hidden', tab !== 'rv');
+    document.getElementById('estadoFilter').classList.toggle('hidden', tab !== 'rv');
+    document.getElementById('concentracionFilter').classList.toggle('hidden', tab !== 'rv');
     document.getElementById('tipoBonoFilter').classList.toggle('hidden', tab !== 'rf');
     document.getElementById('estadoRiesgoFilter').classList.toggle('hidden', tab !== 'rf');
+    document.getElementById('tipoEventoFilter').classList.toggle('hidden', tab !== 'changelog');
   }
 
   function cargarDatos() {
     if (URL_CSV_RENTA_VARIABLE && URL_CSV_RENTA_VARIABLE.length > 10) {
       Papa.parse(URL_CSV_RENTA_VARIABLE, { download: true, header:false, skipEmptyLines:true,
-        complete: r => { datosRV = procesarFilas(r.data, 'rv'); postCargaRV(); },
-        error: () => { datosRV = procesarFilas(baseRV, 'rv'); postCargaRV(); } });
-    } else { datosRV = procesarFilas(baseRV, 'rv'); postCargaRV(); }
+        complete: r => { datosRV = procesarFilasRV(r.data); postCargaRV(); },
+        error: () => { datosRV = procesarFilasRV(baseRV); postCargaRV(); } });
+    } else { datosRV = procesarFilasRV(baseRV); postCargaRV(); }
 
     if (URL_CSV_RENTA_FIJA && URL_CSV_RENTA_FIJA.length > 10) {
       Papa.parse(URL_CSV_RENTA_FIJA, { download: true, header:false, skipEmptyLines:true,
-        complete: r => { datosRF = procesarFilas(r.data, 'rf'); postCargaRF(); },
-        error: () => { datosRF = procesarFilas(baseRF, 'rf'); postCargaRF(); } });
-    } else { datosRF = procesarFilas(baseRF, 'rf'); postCargaRF(); }
+        complete: r => { datosRF = procesarFilasRF(r.data); postCargaRF(); },
+        error: () => { datosRF = procesarFilasRF(baseRF); postCargaRF(); } });
+    } else { datosRF = procesarFilasRF(baseRF); postCargaRF(); }
   }
 
   const MERCADOS_VALIDOS = ['BYMA','B3','Santiago','bvc','BMV','BVL','JSE'];
 
-  function procesarFilas(rows, tipo) {
+  function procesarFilasRV(rows) {
     const list = [];
     rows.forEach(r => {
       if (!r || r.length < 3) return;
       const m = (r[0] || '').trim();
       if (!MERCADOS_VALIDOS.includes(m)) return;
-      if (tipo === 'rv') {
-        list.push({ mercado:m, ticker:r[1]||'', empresa:r[2]||'', sector:r[3]||'', precio:r[4]||'',
-          indiceLocal:r[5]||'', spYearbook:r[6]||'', categoriaSP:r[7]||'', reporte:r[8]||'',
-          estadoReporte:r[9]||'', ultimaAct:r[10]||'' });
-      } else {
-        list.push({ mercado:m, emisor:r[1]||'', bono:r[2]||'', tipo:r[3]||'', estado:r[4]||'',
-          rating:r[5]||'', alerta:r[6]||'', kpi:r[7]||'', enlaceDoc:r[8]||'', fechaRevision:r[9]||'' });
-      }
+      list.push({ mercado:m, pais:r[1]||'', ticker:r[2]||'', empresa:r[3]||'', sector:r[4]||'',
+        indiceLocal:r[6]||'', constituyente:r[7]||'', spYearbook:r[8]||'', categoriaSP:r[9]||'',
+        sitio:r[10]||'', estado:r[11]||'', nota:r[12]||'' });
+    });
+    return list;
+  }
+  function procesarFilasRF(rows) {
+    const list = [];
+    rows.forEach(r => {
+      if (!r || r.length < 3) return;
+      const m = (r[0] || '').trim();
+      if (!MERCADOS_VALIDOS.includes(m)) return;
+      list.push({ mercado:m, pais:r[1]||'', emisor:r[2]||'', bono:r[3]||'', tipo:r[4]||'', estado:r[5]||'',
+        rating:r[6]||'', alerta:r[7]||'', kpi:r[8]||'', enlaceDoc:r[9]||'', fechaRevision:r[10]||'' });
     });
     return list;
   }
 
-  function postCargaRV() {
-    poblarSectorFilter();
-    actualizarKPIs();
-    filterData();
-  }
-  function postCargaRF() {
-    poblarTipoBonoFilter();
-    actualizarKPIs();
-    filterData();
-  }
+  function postCargaRV() { poblarSectorFilter(); actualizarKPIs(); filterData(); }
+  function postCargaRF() { poblarTipoBonoFilter(); actualizarKPIs(); filterData(); }
 
   function poblarSectorFilter() {
     const select = document.getElementById('sectorFilter');
     const actuales = new Set(Array.from(select.options).map(o => o.value));
     const sectores = [...new Set(datosRV.map(i => i.sector).filter(Boolean))].sort();
     sectores.forEach(s => { if (!actuales.has(s)) { const o = document.createElement('option'); o.value = s; o.textContent = s; select.appendChild(o); } });
-  }
-  function poblarTipoBonoFilter() {
-    const select = document.getElementById('tipoBonoFilter');
-    const actuales = new Set(Array.from(select.options).map(o => o.value));
-    const tipos = [...new Set(datosRF.map(i => i.tipo).filter(Boolean))].sort();
-    tipos.forEach(t => { if (!actuales.has(t)) { const o = document.createElement('option'); o.value = t; o.textContent = t; select.appendChild(o); } });
   }
 
   function actualizarKPIs() {
@@ -238,16 +282,49 @@
     document.getElementById('kpi-alerta').textContent = datosRF.filter(i => i.estado.includes('Alerta')).length || '0';
   }
 
-  function formatPrecio(mercado, precioRaw) {
-    if (!precioRaw || precioRaw === '#N/A' || precioRaw === 'N/A') return '<span class="text-[#9ba1a5]">N/D</span>';
-    if (/[A-Za-z]/.test(precioRaw)) return precioRaw; // ya viene con moneda (ej. JSE)
-    const num = parseFloat(precioRaw);
-    if (isNaN(num)) return '<span class="text-[#9ba1a5]">N/D</span>';
-    const moneda = MONEDA_POR_MERCADO[mercado] || '';
-    const locale = LOCALE_POR_MERCADO[mercado] || 'es-AR';
-    try {
-      return moneda + ' ' + num.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    } catch (e) { return moneda + ' ' + num.toFixed(2); }
+  function clasificarEstado(estado) {
+    if (estado.startsWith('Confirmado')) return { label:'Confirmado', style:'background:var(--cap-teal-20);color:#09193a' };
+    if (estado.includes('Pendiente')) return { label:'Pendiente verificación', style:'background:var(--cap-gold-20);color:#09193a' };
+    if (estado.includes('Fuera de') || estado === 'S&P Yearbook 2026') return { label:'Solo Yearbook', style:'background:var(--cap-violet-20);color:#09193a' };
+    return { label: estado, style:'background:var(--cap-gray-10);color:#696484' };
+  }
+
+  function clasificarTipoEvento(tipo) {
+    const map = {
+      entrada: { label:'Entrada', style:'background:var(--cap-teal-20);color:#09193a' },
+      salida: { label:'Salida', style:'background:var(--cap-coral-10);color:#e76f51' },
+      cambio: { label:'Cambio', style:'background:var(--cap-gold-20);color:#09193a' },
+      ampliacion: { label:'Ampliación de índice', style:'background:var(--cap-violet-20);color:#09193a' },
+    };
+    return map[tipo] || { label: tipo, style:'background:var(--cap-gray-10);color:#696484' };
+  }
+
+  function renderizarChangelog(data) {
+    const cont = document.getElementById('changelog-list');
+    cont.innerHTML = '';
+    if (data.length === 0) {
+      cont.innerHTML = '<p class="text-sm text-[#9ba1a5] p-6 text-center bg-white rounded-xl border border-slate-200">No hay movimientos registrados para este filtro.</p>';
+    } else {
+      data.forEach(ev => {
+        const info = clasificarTipoEvento(ev.tipo);
+        const div = document.createElement('div');
+        div.className = 'bg-white border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-start gap-3';
+        div.innerHTML = `
+          <div class="sm:w-28 shrink-0 text-xs text-[#9ba1a5] font-mono pt-0.5">${ev.fecha}</div>
+          <div class="flex-1">
+            <div class="flex items-center gap-2 flex-wrap mb-1">
+              <span class="px-2 py-0.5 rounded-md text-[10px] font-medium" style="background:var(--cap-violet-10);color:#696484">${ev.mercado}</span>
+              <span class="px-2.5 py-0.5 text-xs rounded-full font-medium" style="${info.style}">${info.label}</span>
+            </div>
+            <div class="font-semibold text-sm text-[#09193a]">${ev.titulo}</div>
+            <div class="text-xs text-[#696484] mt-1">${ev.detalle}</div>
+            ${ev.fuente ? `<a href="${ev.fuente}" target="_blank" rel="noopener" class="text-[10px] text-[#60afc1] hover:underline mt-1 inline-block">Ver fuente ↗</a>` : ''}
+          </div>
+        `;
+        cont.appendChild(div);
+      });
+    }
+    document.getElementById('changelog-count').textContent = data.length + ' de ' + changelog.length + ' movimientos registrados';
   }
 
   function renderizarTablaRV(data) {
@@ -257,21 +334,21 @@
       const tr = document.createElement('tr');
       const isSP = item.spYearbook === 'Sí';
       const spBadge = isSP
-        ? '<span class="px-2.5 py-1 text-xs rounded-full font-medium" style="background:var(--cap-teal-20);color:#09193a">Sí</span>'
+        ? `<span class="px-2.5 py-1 text-xs rounded-full font-medium" style="background:var(--cap-teal-20);color:#09193a">Sí${item.categoriaSP && item.categoriaSP !== 'N/A' ? ' · ' + item.categoriaSP : ''}</span>`
         : '<span class="px-2.5 py-1 text-xs rounded-full font-medium" style="background:var(--cap-gray-10);color:#9ba1a5">No</span>';
-      const categoria = (item.categoriaSP && item.categoriaSP !== 'N/A') ? item.categoriaSP : '—';
+      const gfPrefix = GF_PREFIX[item.mercado];
+      const cotizacion = gfPrefix ? `<a href="https://www.google.com/finance/quote/${encodeURIComponent(item.ticker.replace(' ',''))}:${gfPrefix}" target="_blank" rel="noopener" class="text-[10px] text-[#60afc1] hover:underline">Ver cotización ↗</a>` : '';
+      const estadoInfo = clasificarEstado(item.estado);
+      const constituyenteMark = item.constituyente === 'Sí' ? '<span class="text-[#60afc1] font-bold">✓</span> ' : '';
       tr.innerHTML = `
         <td class="p-3.5"><span class="px-2 py-1 rounded-md text-xs font-medium" style="background:var(--cap-violet-10);color:#696484">${item.mercado}</span></td>
-        <td class="p-3.5"><div class="font-semibold text-[#09193a]">${item.ticker}</div><div class="text-xs text-[#9ba1a5]">${item.empresa}</div></td>
-        <td class="p-3.5 text-[#09193a]">${item.sector}</td>
-        <td class="p-3.5 text-right font-mono text-sm text-[#09193a]">${formatPrecio(item.mercado, item.precio)}</td>
-        <td class="p-3.5 text-center">${item.indiceLocal === 'Sí' ? '<span class="text-[#60afc1] font-bold">✓</span>' : '<span class="text-[#9ba1a5]">—</span>'}</td>
+        <td class="p-3.5"><div class="font-semibold text-[#09193a]">${item.ticker}</div><div class="text-xs text-[#9ba1a5]">${item.empresa}</div>${cotizacion}</td>
+        <td class="p-3.5 text-[#09193a] text-sm">${item.sector}</td>
+        <td class="p-3.5 text-xs text-[#09193a]">${constituyenteMark}${item.indiceLocal}</td>
         <td class="p-3.5 text-center">${spBadge}</td>
-        <td class="p-3.5 text-center text-xs text-[#696484]">${categoria}</td>
-        <td class="p-3.5">
-          ${item.reporte ? `<a href="${item.reporte}" target="_blank" rel="noopener" class="text-[#60afc1] hover:underline text-xs font-medium">Ver reporte ↗</a>` : '<span class="text-[#9ba1a5] text-xs">—</span>'}
-          <div class="text-[10px] text-[#9ba1a5] mt-0.5">${item.estadoReporte || ''}${item.ultimaAct ? ' · ' + item.ultimaAct : ''}</div>
-        </td>
+        <td class="p-3.5">${item.sitio ? `<a href="${item.sitio}" target="_blank" rel="noopener" class="text-[#60afc1] hover:underline text-xs font-medium">Ver reporte ↗</a>` : '<span class="text-[#9ba1a5] text-xs">—</span>'}</td>
+        <td class="p-3.5"><span class="px-2.5 py-1 text-xs rounded-full font-medium inline-block" style="${estadoInfo.style}">${estadoInfo.label}</span></td>
+        <td class="p-3.5 text-xs text-[#09193a] max-w-[220px]">${item.nota ? `<span class="inline-block w-1.5 h-1.5 rounded-full bg-[#f5b800] mr-1.5 align-middle"></span>${item.nota}` : '<span class="text-[#9ba1a5]">—</span>'}</td>
       `;
       tbody.appendChild(tr);
     });
@@ -309,6 +386,8 @@
     const text = document.getElementById('searchInput').value.toLowerCase();
     const market = document.getElementById('marketFilter').value;
     const sector = document.getElementById('sectorFilter').value;
+    const estadoSel = document.getElementById('estadoFilter').value;
+    const concentracionSel = document.getElementById('concentracionFilter').value;
     const tipoBono = document.getElementById('tipoBonoFilter').value;
     const estadoRiesgo = document.getElementById('estadoRiesgoFilter').value;
 
@@ -316,7 +395,12 @@
       const matchM = market === 'ALL' || i.mercado === market;
       const matchS = sector === 'ALL' || i.sector === sector;
       const matchT = i.ticker.toLowerCase().includes(text) || i.empresa.toLowerCase().includes(text);
-      return matchM && matchS && matchT;
+      let matchE = true;
+      if (estadoSel === 'Confirmado') matchE = i.estado.startsWith('Confirmado');
+      if (estadoSel === 'Pendiente') matchE = i.estado.includes('Pendiente');
+      if (estadoSel === 'Yearbook') matchE = i.estado.includes('Fuera de') || i.estado === 'S&P Yearbook 2026';
+      const matchC = concentracionSel === 'ALL' || (concentracionSel === 'SI' && i.nota);
+      return matchM && matchS && matchT && matchE && matchC;
     });
     renderizarTablaRV(fRV);
 
@@ -328,6 +412,22 @@
       return matchM && matchTipo && matchEstado && matchT;
     });
     renderizarTablaRF(fRF);
+
+    const tipoEvento = document.getElementById('tipoEventoFilter').value;
+    const fChangelog = changelog.filter(ev => {
+      const matchM = market === 'ALL' || ev.mercado === market;
+      const matchTipo = tipoEvento === 'ALL' || ev.tipo === tipoEvento;
+      const matchT = ev.titulo.toLowerCase().includes(text) || ev.detalle.toLowerCase().includes(text);
+      return matchM && matchTipo && matchT;
+    });
+    renderizarChangelog(fChangelog);
+  }
+
+  function poblarTipoBonoFilter() {
+    const select = document.getElementById('tipoBonoFilter');
+    const actuales = new Set(Array.from(select.options).map(o => o.value));
+    const tipos = [...new Set(datosRF.map(i => i.tipo).filter(Boolean))].sort();
+    tipos.forEach(t => { if (!actuales.has(t)) { const o = document.createElement('option'); o.value = t; o.textContent = t; select.appendChild(o); } });
   }
 
   window.onload = cargarDatos;
