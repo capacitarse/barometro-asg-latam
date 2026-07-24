@@ -24,18 +24,18 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
-        <!-- Banner de Estado -->
-        <div id="status-banner" class="hidden mb-6 p-3 rounded-lg text-xs font-medium bg-amber-900/40 border border-amber-700/50 text-amber-300 flex justify-between items-center">
-            <span>⚠️ Mostrando datos cargados. Si conectas un Google Sheets, se sincronizará automáticamente.</span>
-        </div>
-
-        <!-- Buscador y Filtros -->
+        <!-- Buscador y Filtro por País/Mercado -->
         <div class="flex flex-col sm:flex-row gap-4 mb-6">
             <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Buscar por Ticker, Empresa o Emisor..." class="bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2.5 w-full sm:w-80 focus:outline-none focus:border-emerald-500">
             <select id="marketFilter" onchange="filterData()" class="bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2.5">
-                <option value="ALL">Todos los Mercados</option>
+                <option value="ALL">Todos los Mercados (Latam & Caribe)</option>
                 <option value="BYMA">BYMA (Argentina)</option>
+                <option value="B3">B3 (Brasil)</option>
                 <option value="Santiago">Bolsa de Santiago (Chile)</option>
+                <option value="bvc">bvc (Colombia)</option>
+                <option value="BMV">BMV (México)</option>
+                <option value="BVL">BVL (Perú)</option>
+                <option value="JSE">JSE (Jamaica)</option>
             </select>
         </div>
 
@@ -88,32 +88,36 @@
         const URL_CSV_RENTA_VARIABLE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRniAeWLI97k7vcn5TzlBg0n89Ird3Rb-619RqXvHTEJ-aIniWGzsCIKrYWt0fX_Q/pub?gid=373182793&single=true&output=csv";
         const URL_CSV_RENTA_FIJA = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRniAeWLI97k7vcn5TzlBg0n89Ird3Rb-619RqXvHTEJ-aIniWGzsCIKrYWt0fX_Q/pub?gid=2120126879&single=true&output=csv";
 
-        // Datos ajustados: Solo YPF figura en S&P Yearbook para Argentina
+        // Base de Datos Demo completa para los 7 países
         const demoRV = [
             ["BYMA", "YPFD", "YPF S.A.", "Energía", "Sí", "Sí", "Industry Mover", "https://www.ypf.com/sustentabilidad"],
-            ["BYMA", "ALUA", "Aluar Arg. de Aluminio", "Materiales", "Sí", "No", "N/A", "https://www.aluar.com.ar/sustentabilidad"],
             ["BYMA", "GGAL", "Grupo Financiero Galicia", "Financiero", "Sí", "No", "N/A", "https://www.galicia.ar/sustentabilidad"],
-            ["BYMA", "BMA", "Banco Macro", "Financiero", "Sí", "No", "N/A", "https://www.macro.com.ar/sustentabilidad"],
-            ["BYMA", "BBAR", "BBVA Argentina", "Financiero", "Sí", "No", "N/A", "https://www.bbva.com.ar/sostenibilidad"],
-            ["BYMA", "PAMP", "Pampa Energía", "Servicios Públicos", "Sí", "No", "N/A", "https://www.pampaenergia.com/sustentabilidad"],
-            ["BYMA", "TXAR", "Ternium Argentina", "Materiales", "Sí", "No", "N/A", "https://ar.ternium.com/es/sustentabilidad"],
-            ["BYMA", "BYMA", "Bolsa y Mercados Argentinos", "Financiero", "Sí", "No", "N/A", "https://www.byma.com.ar/sustentabilidad"],
+            ["B3", "B3SA3", "B3 S.A. - Brasil", "Financiero", "Sí", "Sí", "Top 5%", "https://ri.b3.com.br/sostenibilidad"],
+            ["B3", "ITUB4", "Itaú Unibanco", "Financiero", "Sí", "Sí", "Top 10%", "https://www.itau.com.br/sustentabilidade"],
+            ["B3", "SUZB3", "Suzano S.A.", "Materiales", "Sí", "Sí", "Top 5%", "https://www.suzano.com.br/sustentabilidade"],
             ["Santiago", "CMPC", "Empresas CMPC", "Materiales", "Sí", "Sí", "Top 1%", "https://www.cmpc.com/sostenibilidad"],
-            ["Santiago", "AGUAS-A", "Aguas Andinas", "Servicios Públicos", "Sí", "Sí", "Top 5%", "https://www.aguasandinas.cl/sostenibilidad"],
-            ["Santiago", "CAP", "CAP S.A.", "Materiales", "Sí", "Sí", "Top 10%", "https://www.cap.cl/sostenibilidad"],
             ["Santiago", "BSANTANDER", "Banco Santander Chile", "Financiero", "Sí", "Sí", "Top 10%", "https://www.santander.cl/sostenibilidad"],
-            ["Santiago", "ENELCHILE", "Enel Chile", "Servicios Públicos", "Sí", "Sí", "Top 5%", "https://www.enel.cl/sostenibilidad"],
-            ["Santiago", "CENCOSUD", "Cencosud", "Consumo Discrecional", "Sí", "Sí", "Industry Mover", "https://www.cencosud.com/sostenibilidad"],
-            ["Santiago", "SQM-B", "SQM", "Materiales", "Sí", "Sí", "Member", "https://www.sqm.com/sostenibilidad"]
+            ["bvc", "BCOLOMBIA", "Bancolombia", "Financiero", "Sí", "Sí", "Top 1%", "https://www.bancolombia.com/sostenibilidad"],
+            ["bvc", "ISA", "Interconexión Eléctrica ISA", "Servicios Públicos", "Sí", "Sí", "Top 5%", "https://www.isa.co/sostenibilidad"],
+            ["BMV", "GFNORTE", "Grupo Financiero Banorte", "Financiero", "Sí", "Sí", "Top 5%", "https://investors.banorte.com/sostenibilidad"],
+            ["BMV", "CEMEX", "Cemex", "Materiales", "Sí", "Sí", "Top 10%", "https://www.cemex.com/sostenibilidad"],
+            ["BVL", "BAP", "Credicorp / BCP", "Financiero", "Sí", "Sí", "Member", "https://www.credicorp.com/sostenibilidad"],
+            ["BVL", "CPACASC1", "Cementos Pacasmayo", "Materiales", "Sí", "Sí", "Industry Mover", "https://www.cementospacasmayo.com.pe"],
+            ["JSE", "NCBFG", "NCB Financial Group", "Financiero", "Sí", "No", "N/A", "https://www.myncb.com/sustainability"]
         ];
 
         const demoRF = [
             ["BYMA", "Plaza Logística", "BPO2O", "Verde", "🟢 Normal", "AA+(arg)", "Cumplimiento normal de repagos", "Emisión neta neutral en parques"],
-            ["BYMA", "YPF S.A.", "YCA6O", "Verde", "🟢 Normal", "A+(arg)", "Cupón al día, proyectos parque eólico 100%", "Construcción parque solar/eólico"],
-            ["BYMA", "Empresa Ejemplo AR", "EXAR1", "SLB", "🔴 Alerta Default", "CCC", "Aumento inusual de spreads, mora en auditoría", "Reducción 20% intensidad carbono (Incumplido)"],
-            ["Santiago", "Codelco", "US219876", "Sostenible", "🟡 Observación", "BBB+", "Revisión perspectiva por retraso proyectos agua", "Reducción 60% agua fresca 2030"],
-            ["Santiago", "VTR Finance", "US918321", "SLB", "🔴 Alerta Default", "CC", "Riesgo reestructuración deuda / periodo gracia", "Fibra óptica rural y eficiencia energética"],
-            ["Santiago", "Banco Estado Chile", "CL000889", "Social", "🟢 Normal", "AAA (cl)", "Emisión social con alto impacto social", "Financiamiento vivienda y micropymes"]
+            ["B3", "Suzano S.A.", "US86964W", "SLB", "🟢 Normal", "BBB-", "Monitoreo regular de metas", "Reducción intensidad agua industrial 15%"],
+            ["B3", "Light S.A.", "US532241", "Verde", "🔴 Alerta Default", "D", "En proceso de Recuperación Judicial", "Pérdidas no técnicas y proyectos eficiencia"],
+            ["Santiago", "Codelco", "US219876", "Sostenible", "🟡 Observación", "BBB+", "Ajuste en proyectos hídricos", "Reducción 60% uso agua fresca 2030"],
+            ["Santiago", "VTR Finance", "US918321", "SLB", "🔴 Alerta Default", "CC", "Riesgo reestructuración / periodo gracia", "Fibra óptica rural y eficiencia energética"],
+            ["bvc", "Bancolombia", "US05968L", "Sostenible", "🟢 Normal", "BB+", "Emisión sostenible destacada", "Proyectos de energía solar y vivienda social"],
+            ["bvc", "Ecopetrol", "US279158", "Sostenible", "🟡 Observación", "BB+", "Seguimiento descarbonización", "Reducción emisiones Alcance 1 y 2 al 25%"],
+            ["BMV", "Cemex", "US151290", "SLB", "🟢 Normal", "BBB-", "Meta CO2 cumplida por tonelada", "Cemento bajo carbono Vertua"],
+            ["BMV", "TV Azteca", "US88034P", "Sostenible", "🔴 Alerta Default", "D", "Conflicto legal / Incumplimiento de cupones", "Inclusión digital comunidades alejadas"],
+            ["BVL", "COFIDE", "US197022", "Sostenible", "🟢 Normal", "BBB-", "Fondo desarrollo operando normal", "Financiamiento pymes lideradas por mujeres"],
+            ["JSE", "TransJam Infra", "JM000100", "Verde", "🟢 Normal", "A+(jm)", "Pagos peaje verde regulares", "Reforestación y alumbrado solar en autopistas"]
         ];
 
         let datosRV = [];
@@ -182,19 +186,14 @@
 
         function procesarFilasRV(rows) {
             const list = [];
+            const mercadosValidos = ['BYMA', 'B3', 'Santiago', 'bvc', 'BMV', 'BVL', 'JSE'];
             rows.forEach(r => {
                 if (!r || r.length < 3) return;
                 const m = (r[0] || '').trim();
-                if (m === 'BYMA' || m === 'Santiago') {
+                if (mercadosValidos.includes(m)) {
                     list.push({
-                        mercado: m,
-                        ticker: r[1] || '',
-                        empresa: r[2] || '',
-                        sector: r[3] || '',
-                        indiceLocal: r[4] || '',
-                        spYearbook: r[5] || '',
-                        categoriaSP: r[6] || '',
-                        reporte: r[7] || ''
+                        mercado: m, ticker: r[1] || '', empresa: r[2] || '', sector: r[3] || '',
+                        indiceLocal: r[4] || '', spYearbook: r[5] || '', categoriaSP: r[6] || '', reporte: r[7] || ''
                     });
                 }
             });
@@ -206,19 +205,14 @@
 
         function procesarFilasRF(rows) {
             const list = [];
+            const mercadosValidos = ['BYMA', 'B3', 'Santiago', 'bvc', 'BMV', 'BVL', 'JSE'];
             rows.forEach(r => {
                 if (!r || r.length < 3) return;
                 const m = (r[0] || '').trim();
-                if (m === 'BYMA' || m === 'Santiago') {
+                if (mercadosValidos.includes(m)) {
                     list.push({
-                        mercado: m,
-                        emisor: r[1] || '',
-                        bono: r[2] || '',
-                        tipo: r[3] || '',
-                        estado: r[4] || '',
-                        rating: r[5] || '',
-                        alerta: r[6] || '',
-                        kpi: r[7] || ''
+                        mercado: m, emisor: r[1] || '', bono: r[2] || '', tipo: r[3] || '',
+                        estado: r[4] || '', rating: r[5] || '', alerta: r[6] || '', kpi: r[7] || ''
                     });
                 }
             });
