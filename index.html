@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barómetro ASG Latam — Hub de Inteligencia Bursátil & Riesgo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-3 h-8 bg-emerald-500 rounded-full"></div>
+                <h1 class="text-2xl font-bold tracking-tight text-white">Barómetro <span class="text-emerald-400">ASG Latam</span></h1>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="switchTab('rv')" id="btn-rv" class="px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-lg">Renta Variable (Acciones)</button>
+                <button onclick="switchTab('rf')" id="btn-rf" class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-300 hover:bg-slate-700">Renta Fija (Bonos ASG)</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Buscador y Filtros -->
+        <div class="flex flex-col sm:flex-row gap-4 mb-6">
+            <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Buscar por Ticker, Empresa o Emisor..." class="bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2.5 w-full sm:w-80 focus:outline-none focus:border-emerald-500">
+            <select id="marketFilter" onchange="filterData()" class="bg-slate-800 border border-slate-700 text-white rounded-lg px-4 py-2.5">
+                <option value="ALL">Todos los Mercados</option>
+                <option value="BYMA">BYMA (Argentina)</option>
+                <option value="Santiago">Bolsa de Santiago (Chile)</option>
+            </select>
+        </div>
+
+        <!-- Vista Renta Variable -->
+        <div id="tab-rv" class="block">
+            <div class="overflow-x-auto bg-slate-950 border border-slate-800 rounded-xl shadow-xl">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-800/80 text-xs text-slate-400 uppercase">
+                        <tr>
+                            <th class="p-4">Mercado</th>
+                            <th class="p-4">Ticker / Empresa</th>
+                            <th class="p-4">Sector</th>
+                            <th class="p-4 text-center">Índice Local</th>
+                            <th class="p-4 text-center">S&P Yearbook</th>
+                            <th class="p-4 text-center">Categoría S&P</th>
+                            <th class="p-4 text-center">Reporte ASG</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rv-table-body" class="divide-y divide-slate-800 text-sm">
+                        <!-- Se llena dinámicamente con Google Sheets -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Vista Renta Fija -->
+        <div id="tab-rf" class="hidden">
+            <div class="overflow-x-auto bg-slate-950 border border-slate-800 rounded-xl shadow-xl">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-800/80 text-xs text-slate-400 uppercase">
+                        <tr>
+                            <th class="p-4">Mercado</th>
+                            <th class="p-4">Emisor / Bono</th>
+                            <th class="p-4">Tipo</th>
+                            <th class="p-4 text-center">Estado Riesgo</th>
+                            <th class="p-4">Alerta / Indicador</th>
+                            <th class="p-4">KPI Sostenibilidad</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rf-table-body" class="divide-y divide-slate-800 text-sm">
+                        <!-- Se llena dinámicamente con Google Sheets -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Pega aquí las URLs en formato CSV que te da Google Sheets (Archivo -> Compartir -> Publicar en la Web -> CSV)
+        const URL_CSV_RENTA_VARIABLE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRniAeWLI97k7vcn5TzlBg0n89Ird3Rb-619RqXvHTEJ-aIniWGzsCIKrYWt0fX_Q/pub?gid=373182793&single=true&output=csv";
+        const URL_CSV_RENTA_FIJA = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRniAeWLI97k7vcn5TzlBg0n89Ird3Rb-619RqXvHTEJ-aIniWGzsCIKrYWt0fX_Q/pub?gid=2120126879&single=true&output=csv";
+
+        function switchTab(tab) {
+            document.getElementById('tab-rv').classList.toggle('hidden', tab !== 'rv');
+            document.getElementById('tab-rf').classList.toggle('hidden', tab !== 'rf');
+            document.getElementById('btn-rv').className = tab === 'rv' ? 'px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-lg' : 'px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-300';
+            document.getElementById('btn-rf').className = tab === 'rf' ? 'px-4 py-2 rounded-lg text-sm font-medium bg-emerald-600 text-white shadow-lg' : 'px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-300';
+        }
+
+        // Aquí irá tu lógica con PapaParse para leer los CSVs, tal como lo hiciste en mcg-strathos
+    </script>
+</body>
+</html>
