@@ -33,7 +33,7 @@
   <div class="h-[5px] bg-[#60afc1]"></div>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
     <div class="flex items-center gap-4">
-<img src="logo-CapacitaRSE.png" alt="CapacitaRSE" class="h-14 w-auto shrink-0">
+      <img src="logo-CapacitaRSE.png" alt="CapacitaRSE" class="h-14 w-auto shrink-0">
       <div>
         <h1 class="text-2xl sm:text-[28px] font-bold tracking-tight text-[#09193a]">Barómetro <span class="text-[#60afc1]">ASG Latam</span></h1>
         <p class="text-sm text-[#696484] mt-0.5">Renta variable y renta fija ASG en 7 mercados de la región · <a href="https://cursosderse.com" class="underline hover:text-[#60afc1]">CapacitaRSE</a></p>
@@ -43,6 +43,7 @@
       <button onclick="switchTab('rv')" id="btn-rv" class="tab-active flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors">Renta Variable</button>
       <button onclick="switchTab('rf')" id="btn-rf" class="tab-inactive flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors hover:bg-white">Renta Fija</button>
       <button onclick="switchTab('changelog')" id="btn-changelog" class="tab-inactive flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors hover:bg-white">Radar de Movimientos</button>
+      <button onclick="switchTab('metodologia')" id="btn-metodologia" class="tab-inactive flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors hover:bg-white">Cómo Leer Este Dato</button>
     </nav>
   </div>
 </header>
@@ -171,6 +172,61 @@
     <p id="changelog-count" class="text-xs text-[#9ba1a5] mt-4"></p>
   </div>
 
+  <!-- Vista Metodología -->
+  <div id="tab-metodologia" class="hidden">
+    <div class="bg-white border border-slate-200 rounded-xl p-6 sm:p-10 max-w-3xl">
+      <p class="text-lg sm:text-xl font-bold text-[#09193a] leading-snug uppercase tracking-tight">
+        40 de las 182 empresas de este Barómetro no son constituyentes confirmados de ningún índice ASG local
+      </p>
+      <p class="text-sm text-[#696484] mt-3 leading-relaxed">
+        28 tienen su dato pendiente de verificación en fuente primaria y 12 operan en mercados donde ese índice directamente no existe. Ninguna de las dos situaciones equivale a mal desempeño ASG. Equivalen a que la frase "está en un índice ESG", tal como se usa habitualmente, esconde al menos cuatro capas distintas de rigor metodológico. El Barómetro las distingue porque el mercado, en general, no lo hace.
+      </p>
+
+      <h3 class="text-sm font-bold text-[#09193a] mt-8 mb-2 uppercase tracking-wide">1. Constituyente de índice local</h3>
+      <p class="text-sm text-[#696484] leading-relaxed">
+        Bolsas como BYMA, B3, la Bolsa de Santiago o la BVL publican un índice de sostenibilidad con metodología propia: una canasta cerrada de empresas que se recalcula en rebalanceos periódicos, con criterios cuantitativos de desempeño ambiental, social y de gobernanza. Es la capa con mayor rigor metodológico y también la más volátil. En el 7° rebalanceo de BYMA (junio 2026), Ferrum S.A. reemplazó a Pampa Energía sin que hubiera un evento reputacional de por medio: fue el resultado normal del proceso de evaluación periódica. Ese tipo de movimiento queda registrado en la pestaña Radar de Movimientos.
+      </p>
+
+      <h3 class="text-sm font-bold text-[#09193a] mt-6 mb-2 uppercase tracking-wide">2. S&amp;P Global Sustainability Yearbook</h3>
+      <p class="text-sm text-[#696484] leading-relaxed">
+        Es un ranking global, no un índice de mercado. En la edición 2026, S&amp;P Global evaluó más de 9.200 empresas y seleccionó 848 (menos del 10%) para el Anuario, clasificadas en niveles (Top 1%, Top 5%, Top 10%) además de la categoría general de miembro. Una empresa puede estar en el Yearbook sin ser constituyente de ningún índice local (Suzano y Petrobras en Brasil, Aguas Andinas y SQM en Chile), o al revés.
+      </p>
+
+      <h3 class="text-sm font-bold text-[#09193a] mt-6 mb-2 uppercase tracking-wide">3. Ausencia de índice, no ausencia de dato</h3>
+      <p class="text-sm text-[#696484] leading-relaxed">
+        No todos los mercados de la región tienen un índice ASG de desempeño propio. La Bolsa de Colombia (bvc) tiene un índice de prácticas de relación con inversores (Colir), que mide transparencia y comunicación con el mercado, no desempeño ambiental o social. Tratarlo como equivalente sería un error metodológico. La Bolsa de Jamaica (JSE) no tiene ningún índice de sostenibilidad. En ambos casos, el Barómetro reporta únicamente la presencia en el Yearbook global, sin inventar una categoría local que no existe.
+      </p>
+
+      <h3 class="text-sm font-bold text-[#09193a] mt-6 mb-2 uppercase tracking-wide">4. Dato pendiente de verificación</h3>
+      <p class="text-sm text-[#696484] leading-relaxed">
+        La composición vigente del S&amp;P/BMV Total Mexico ESG Index está detrás de un registro en S&amp;P Dow Jones Indices que no expone la lista pública de constituyentes. La tabla mexicana del Barómetro es la última composición verificable en fuente abierta, no necesariamente la lista oficial del rebalanceo más reciente. Se etiqueta así en vez de presentarla con la misma certeza que el resto.
+      </p>
+
+      <h3 class="text-sm font-bold text-[#09193a] mt-6 mb-2 uppercase tracking-wide">Concentración de cadena de suministro</h3>
+      <p class="text-sm text-[#696484] leading-relaxed">
+        47 de las 182 empresas llevan además una nota breve sobre su peso relativo en minería, alimentos o logística: mercados donde pocos actores concentran la oferta o donde la empresa opera un nodo difícil de sustituir en el corto plazo. No es un juicio de valor sobre su desempeño ASG. Es información de contexto sobre el rol que ocupa en su cadena.
+      </p>
+
+      <div class="mt-8 pt-6 border-t border-slate-200">
+        <h3 class="text-sm font-bold text-[#09193a] mb-3 uppercase tracking-wide">En síntesis: qué significa cada etiqueta</h3>
+        <div class="flex flex-col gap-2">
+          <div class="flex items-start gap-3">
+            <span class="px-2.5 py-1 text-xs rounded-full font-medium shrink-0" style="background:var(--cap-teal-20);color:#09193a">Confirmado</span>
+            <span class="text-xs text-[#696484] pt-1">Constituyente verificado del índice de sostenibilidad local vigente.</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="px-2.5 py-1 text-xs rounded-full font-medium shrink-0" style="background:var(--cap-gold-20);color:#09193a">Pendiente verificación</span>
+            <span class="text-xs text-[#696484] pt-1">Dato tomado de la última fuente pública disponible, no de la lista oficial más reciente.</span>
+          </div>
+          <div class="flex items-start gap-3">
+            <span class="px-2.5 py-1 text-xs rounded-full font-medium shrink-0" style="background:var(--cap-violet-20);color:#09193a">Solo Yearbook</span>
+            <span class="text-xs text-[#696484] pt-1">Presente en el S&amp;P Global Sustainability Yearbook, sin ser constituyente de un índice local.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <footer class="mt-10 pt-6 border-t border-slate-200 text-xs text-[#9ba1a5] leading-relaxed">
     <p>Barómetro ASG Latam · CapacitaRSE — <a href="https://cursosderse.com" class="underline hover:text-[#60afc1]">cursosderse.com</a></p>
     <p class="mt-1">Información de referencia con fines educativos y de monitoreo. No constituye recomendación de inversión ni asesoramiento financiero. Verificar siempre en la fuente oficial de cada bolsa o emisor.</p>
@@ -214,8 +270,10 @@
     document.getElementById('tab-rv').classList.toggle('hidden', tab !== 'rv');
     document.getElementById('tab-rf').classList.toggle('hidden', tab !== 'rf');
     document.getElementById('tab-changelog').classList.toggle('hidden', tab !== 'changelog');
-    ['rv','rf','changelog'].forEach(t => {
-      document.getElementById('btn-' + t).className = (tab === t ? 'tab-active' : 'tab-inactive') + ' flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors hover:bg-white';
+    document.getElementById('tab-metodologia').classList.toggle('hidden', tab !== 'metodologia');
+    ['rv','rf','changelog','metodologia'].forEach(t => {
+      const base = 'flex-1 lg:flex-none px-4 py-2 rounded-md text-sm font-semibold transition-colors';
+      document.getElementById('btn-' + t).className = tab === t ? ('tab-active ' + base) : ('tab-inactive ' + base + ' hover:bg-white');
     });
     document.getElementById('sectorFilter').classList.toggle('hidden', tab !== 'rv');
     document.getElementById('estadoFilter').classList.toggle('hidden', tab !== 'rv');
@@ -223,6 +281,8 @@
     document.getElementById('tipoBonoFilter').classList.toggle('hidden', tab !== 'rf');
     document.getElementById('estadoRiesgoFilter').classList.toggle('hidden', tab !== 'rf');
     document.getElementById('tipoEventoFilter').classList.toggle('hidden', tab !== 'changelog');
+    document.getElementById('searchInput').classList.toggle('hidden', tab === 'metodologia');
+    document.getElementById('marketFilter').classList.toggle('hidden', tab === 'metodologia');
   }
 
   function cargarDatos() {
